@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Почта зимних волшебников</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      /* Красно-бордовый фон в стиле шубы Деда Мороза */
+      --bg-main-top: #7f1020;
+      --bg-main-bottom: #3b0710;
+      --card-bg: rgba(15, 23, 42, 0.9);
+      --card-inner: #020617;
+      --accent: #fbbf24;
+      --accent-soft: rgba(251, 191, 36, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #e5e7eb;
+      --border: rgba(254, 243, 199, 0.9);
+      --radius-lg: 22px;
+      --shadow-soft: 0 28px 65px rgba(15, 23, 42, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #991b1b 0%, #7f1020 35%, #3b0710 100%);
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 16px 56px;
+    }
+
+    .page-card {
+      position: relative;
+      background:
+        radial-gradient(circle at top left, rgba(248, 250, 252, 0.04), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(248, 250, 252, 0.06), transparent 60%),
+        linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
+      border-radius: 34px;
+      box-shadow: var(--shadow-soft);
+      padding: 30px 22px 34px;
+      border: 1px solid rgba(15, 23, 42, 0.95);
+      overflow: hidden;
+    }
+
+    .page-card-inner {
+      background:
+        radial-gradient(circle at top, rgba(254, 243, 199, 0.09), transparent 60%),
+        var(--card-inner);
+      border-radius: 26px;
+      border: 1px solid var(--border);
+      padding: 24px 20px 30px;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .page-card {
+        padding: 34px 30px 40px;
+      }
+      .page-card-inner {
+        padding: 26px 26px 32px;
+      }
+    }
+
+    /* Гирлянда сверху */
+    .lights {
+      position: absolute;
+      top: 10px;
+      left: 16px;
+      right: 16px;
+      height: 38px;
+      pointer-events: none;
+    }
+
+    .lights svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      opacity: 0.95;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin: 0 0 10px;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle {
+      margin: 0 0 26px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-size: 15px;
+      max-width: 640px;
+    }
+
+    h2 {
+      font-size: 21px;
+      margin: 26px 0 12px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 12px 0 4px;
+    }
+
+    p {
+      margin: 4px 0 10px;
+      line-height: 1.7;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .section {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(249, 250, 251, 0.35);
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      margin-bottom: 10px;
+      border: 1px solid rgba(251, 191, 36, 0.55);
+    }
+
+    .badge span {
+      font-size: 14px;
+    }
+
+    .list-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    @media (min-width: 700px) {
+      .list-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(249, 250, 251, 0.18);
+      padding: 14px 14px 16px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+    }
+
+    .card small {
+      display: block;
+      font-size: 11px;
+      color: #cbd5f5;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 11px;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.12);
+      color: #fef3c7;
+      border: 1px solid rgba(252, 211, 77, 0.65);
+    }
+
+    a {
+      color: #bfdbfe;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(30, 64, 175, 0.6);
+      border: 1px solid rgba(191, 219, 254, 0.9);
+      text-decoration: none;
+    }
+
+    .btn-link span.icon {
+      font-size: 15px;
+    }
+
+    .hint {
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: var(--radius-lg);
+      padding: 10px 12px;
+      border: 1px dashed rgba(249, 250, 251, 0.6);
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    .hint strong {
+      color: #ffe9b3;
+    }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+      padding-top: 18px;
+    }
+
+    @media (min-width: 720px) {
+      .hero {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .hero-text {
+      flex: 1.2;
+    }
+
+    .hero-graphic {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 0 0;
+    }
+
+    .hero-image-slot {
+      width: 100%;
+      max-width: 340px;
+      border-radius: 26px;
+      padding: 8px;
+      background:
+        radial-gradient(circle at top, rgba(254, 243, 199, 0.7), rgba(124, 45, 18, 0.8)),
+        #111827;
+      border: 1px solid rgba(254, 243, 199, 0.95);
+      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-image {
+      width: 100%;
+      border-radius: 22px;
+      display: block;
+      object-fit: cover;
+    }
+
+    .hero-image-placeholder {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 18px 12px;
+      line-height: 1.6;
+    }
+
+    /* Секция "Как написать письмо" */
+    .tips-list {
+      margin: 8px 0 4px;
+      padding-left: 18px;
+      font-size: 13px;
+    }
+
+    .tips-list li {
+      margin-bottom: 4px;
+    }
+
+    .tips-subtitle {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-card">
+      <div class="page-card-inner">
+        <div class="lights" aria-hidden="true">
+          <!-- Гирлянда поверх бордового фона -->
+          <svg viewBox="0 0 400 60">
+            <path d="M10 15 C 60 40, 120 5, 180 25 S 300 40, 390 18" fill="none" stroke="rgba(249,250,251,0.4)" stroke-width="2" stroke-linecap="round"/>
+            <g fill="#fed7aa" stroke="#78350f" stroke-width="1">
+              <ellipse cx="40" cy="26" rx="5" ry="8"/>
+              <ellipse cx="95" cy="12" rx="5" ry="8"/>
+              <ellipse cx="150" cy="30" rx="5" ry="8"/>
+              <ellipse cx="210" cy="14" rx="5" ry="8"/>
+              <ellipse cx="265" cy="32" rx="5" ry="8"/>
+              <ellipse cx="320" cy="18" rx="5" ry="8"/>
+              <ellipse cx="365" cy="26" rx="5" ry="8"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="hero">
+          <div class="hero-text">
+            <h1>Почта зимних волшебников ✨</h1>
+            <p class="subtitle">
+              Представьте, что вы сидите у камина с кружкой горячего чая или какао — и рядом лежит
+              чистый конверт. Сегодня — хороший день, чтобы написать пару честных строк Санта Клаусу,
+              Деду Морозу или любому другому зимнему волшебнику. Выберите онлайн-сервис или реальный
+              адрес и отправьте свое маленькое желание во Вселенную.
+            </p>
+          </div>
+          <div class="hero-graphic" aria-hidden="true">
+            <div class="hero-image-slot">
+              <!-- Замените src на свою акварельную картинку камина -->
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKResbVY7IWSEyolNwuBSCWbdW8z4D7XXCbw&s"
+                alt="Уютный камин и письма"
+                class="hero-image"
+              />
+              <!-- Пример:
+              <img src="fireplace-watercolor.jpg" alt="Уютный новогодний камин" class="hero-image" />
+              -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Онлайн-письма -->
+        <section class="section" id="online">
+          <div class="badge">
+            <span>💻</span>
+            <span>Онлайн-письма</span>
+          </div>
+          <h2>Онлайн-адреса Санты и Дедов Морозов</h2>
+          <p>
+            Здесь можно написать письмо прямо с экрана — по-русски, по-белорусски или по-английски.
+            Можно выбрать того, к кому сейчас больше тянется душа: белорусского Деда Мороза,
+            Санта Клауса из Лапландии или Устюга.
+          </p>
+
+          <div class="list-grid">
+            <!-- Белорусский Дед Мороз -->
+            <article class="card">
+              <small>Дед Мороз • Беларусь, Беловежская пуща</small>
+              <h3>Белорусский Дед Мороз онлайн</h3>
+              <p>
+                На сайте национального парка «Беловежская пуща» периодически появляется раздел,
+                где можно отправить электронное письмо белорусскому Деду Морозу. Формат акции
+                и страница могут меняться от года к году, но начать поиск волшебной формы можно здесь.
+              </p>
+              <a class="btn-link" href="https://npbp.by" target="_blank" rel="noopener noreferrer">
+                <span class="icon">🧙‍♂️</span>
+                <span>Перейти на сайт Беловежской пущи</span>
+              </a>
+              <div class="pill-row">
+                <span class="pill">На русском и белорусском</span>
+                <span class="pill">Простая онлайн-форма</span>
+              </div>
+            </article>
+
+            <!-- Email Santa -->
+            <article class="card">
+              <small>Santa Claus • международно</small>
+              <h3>EmailSanta.com</h3>
+              <p>
+                Классический сайт, где можно написать письмо Санте через веб-форму и почти сразу
+                получить «ответ с Севера». Без регистрации, бесплатно.
+              </p>
+              <a class="btn-link" href="https://www.emailsanta.com" target="_blank" rel="noopener noreferrer">
+                <span class="icon">✉️</span>
+                <span>Написать Санте на EmailSanta.com</span>
+              </a>
+              <div class="pill-row">
+                <span class="pill">Бесплатно</span>
+                <span class="pill">Без регистрации</span>
+                <span class="pill">На английском</span>
+              </div>
+            </article>
+
+            <!-- Дед Мороз из Великого Устюга -->
+            <article class="card">
+              <small>Дед Мороз • Великий Устюг</small>
+              <h3>Дед Мороз из Великого Устюга (email)</h3>
+              <p>
+                Электронный адрес российского Деда Мороза из Великого Устюга. Можно написать письмо
+                с поздравлениями, мечтами и планами на следующий год.
+              </p>
+              <a class="btn-link" href="mailto:postcard@ao-dedmoroz.ru">
+                <span class="icon">📧</span>
+                <span>Написать на email: postcard@ao-dedmoroz.ru</span>
+              </a>
+              <div class="pill-row">
+                <span class="pill">Бесплатно</span>
+                <span class="pill">Без регистрации</span>
+                <span class="pill">На русском</span>
+              </div>
+            </article>
+
+            <!-- Santa's Mail Room -->
+            <article class="card">
+              <small>Santa Claus • международно</small>
+              <h3>Santa’s Mail Room</h3>
+              <p>
+                Сервис SantaOnline, где можно отправить персональное email-письмо Санте и получить ответ.
+                Для тех, кто любит классический формат «пишу письмо волшебнику».
+              </p>
+              <a class="btn-link" href="https://santaonline.net/the-mail-room/" target="_blank" rel="noopener noreferrer">
+                <span class="icon">📮</span>
+                <span>Написать Санте в Santa’s Mail Room</span>
+              </a>
+              <div class="pill-row">
+                <span class="pill">Бесплатный email</span>
+                <span class="pill">Без регистрации</span>
+                <span class="pill">На английском</span>
+              </div>
+            </article>
+
+            <!-- Santa Claus Office (Lapland, email) -->
+            <article class="card">
+              <small>Santa Claus • Финляндия</small>
+              <h3>Santa Claus Office (email)</h3>
+              <p>
+                Официальный адрес электронной почты Санта Клауса в Рованиеми. Почти тот самый
+                «настоящий полярный email».
+              </p>
+              <a class="btn-link" href="mailto:santa.claus@santaclausoffice.fi">
+                <span class="icon">📨</span>
+                <span>Написать на email: santa.claus@santaclausoffice.fi</span>
+              </a>
+              <div class="pill-row">
+                <span class="pill">Бесплатно</span>
+                <span class="pill">Без регистрации</span>
+                <span class="pill">На английском</span>
+              </div>
+            </article>
+
+            <!-- Santa’s North Pole -->
+            <article class="card">
+              <small>Santa Claus • онлайн</small>
+              <h3>Santa’s North Pole</h3>
+              <p>
+                Сервис, где можно прямо на сайте «напечатать» письмо Санте. Удобный вариант,
+                если хочется быстро оформить мысли и сразу отправить.
+              </p>
+              <a class="btn-link" href="https://www.santasnorthpole.com/activities/write-letter-santa" target="_blank" rel="noopener noreferrer">
+                <span class="icon">🖊️</span>
+                <span>Написать письмо на сайте</span>
+              </a>
+              <div class="pill-row">
+                <span class="pill">Бесплатно</span>
+                <span class="pill">Без регистрации</span>
+                <span class="pill">На английском</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="hint">
+            <strong>Небольшая подсказка:</strong> не переживайте из-за «идеального» английского
+            или формулировок. Зимним волшебникам важнее живой голос человека по ту сторону письма,
+            чем грамматика.
+          </div>
+        </section>
+
+        <!-- Бумажные письма -->
+        <section class="section" id="paper">
+          <div class="badge">
+            <span>✉️</span>
+            <span>Настоящие бумажные письма</span>
+          </div>
+          <h2>Куда отправить бумажное письмо</h2>
+          <p>
+            Бумажное письмо — это уже почти ритуал: конверт, марка, почтовый штемпель и немного ожидания.
+            Ниже — адреса резиденций Дедов Морозов и Санта Клауса, куда можно отправить письмо по-настоящему.
+          </p>
+
+          <div class="list-grid">
+            <!-- Белорусский Дед Мороз -->
+            <article class="card">
+              <small>Дед Мороз • Беларусь</small>
+              <h3>Белорусский Дед Мороз (Беловежская пуща)</h3>
+              <p>
+                <strong>Кому:</strong> Деду Морозу<br />
+                <strong>Адрес:</strong> «Резиденция Деда Мороза»,<br />
+                п/о Каменюки, Каменецкий р-н,<br />
+                Брестская обл., 225063, Беларусь
+              </p>
+              <p style="font-size:12px;">
+                Можно писать по-русски или по-белорусски. Добавьте в конверт немного тепла: открытку,
+                рисунок или пару строк от руки.
+              </p>
+            </article>
+
+            <!-- Великий Устюг -->
+            <article class="card">
+              <small>Дед Мороз • Россия</small>
+              <h3>Дед Мороз из Великого Устюга</h3>
+              <p>
+                <strong>Кому:</strong> Деду Морозу<br />
+                <strong>Адрес:</strong> 162340, Россия,<br />
+                Вологодская область, г. Великий Устюг,<br />
+                Дом Деда Мороза
+              </p>
+              <p style="font-size:12px;">
+                Один из самых известных «новогодних» адресов — сюда каждый год приходят мешки писем
+                от детей и взрослых.
+              </p>
+            </article>
+
+            <!-- Финляндия: деревня Санты -->
+            <article class="card">
+              <small>Santa Claus • Финляндия</small>
+              <h3>Santa Claus Village (Лапландия)</h3>
+              <p>
+                <strong>Кому:</strong> Santa Claus<br />
+                <strong>Адрес:</strong> Santa Claus Village,<br />
+                96930 Rovaniemi, Finland
+              </p>
+              <p style="font-size:12px;">
+                Письма попадают в знаменитую деревню Санты в Рованиеми. Иногда приходят ответы
+                с полярным штемпелем — как маленькое чудо в почтовом ящике.
+              </p>
+            </article>
+
+            <!-- Финляндия: главное почтовое отделение -->
+            <article class="card">
+              <small>Santa Claus • Финляндия</small>
+              <h3>Santa Claus’ Main Post Office</h3>
+              <p>
+                <strong>Кому:</strong> Santa Claus<br />
+                <strong>Адрес:</strong> Santa Claus’ Main Post Office,<br />
+                Tähtikuja 1, 96930 Arctic Circle,<br />
+                Lapland, Finland
+              </p>
+              <p style="font-size:12px;">
+                Официальное рождественское отделение финской почты на Полярном круге — для тех, кто
+                любит географию чудес.
+              </p>
+            </article>
+
+            <!-- Германия Himmelpfort -->
+            <article class="card">
+              <small>Weihnachtsmann • Германия</small>
+              <h3>Weihnachtspostamt Himmelpfort</h3>
+              <p>
+                <strong>Кому:</strong> An den Weihnachtsmann<br />
+                <strong>Адрес:</strong> Weihnachtspостfiliale,<br />
+                16798 Himmelpfort, Germany
+              </p>
+              <p style="font-size:12px;">
+                Популярное рождественское почтовое отделение Германии, где отвечают на письма
+                со всего мира.
+              </p>
+            </article>
+
+            <!-- Польша: Сребрна Гура -->
+            <article class="card">
+              <small>Święty Mikołaj • Польша</small>
+              <h3>Polska Wioska Świętego Mikołaja</h3>
+              <p>
+                <strong>Кому:</strong> Świętemu Mikołajowi<br />
+                <strong>Адрес:</strong> Biuro Listów do Świętego Mikołaja,<br />
+                Polska Wioska Świętego Mikołaja,<br />
+                Przystanek Mikołajów, 57-215 Srebrna Góra, Polska
+              </p>
+              <p style="font-size:12px;">
+                Польское «Бюро писем к Святому Миколаю» — еще одна точка на карте, где письма попадают
+                в правильные руки.
+              </p>
+            </article>
+
+            <!-- Северный полюс USPS -->
+            <article class="card">
+              <small>Santa • США</small>
+              <h3>Санта, Северный полюс (адрес USPS)</h3>
+              <p>
+                <strong>Кому:</strong> Santa<br />
+                <strong>Адрес:</strong> 123 Elf Road,<br />
+                North Pole, 88888, USA
+              </p>
+              <p style="font-size:12px;">
+                Адрес, который использует почта США в программе Operation Santa. Даже если ответ не придет,
+                само письмо станет частью хорошей предновогодней традиции.
+              </p>
+            </article>
+          </div>
+
+          <div class="hint">
+            <strong>Важно:</strong> в бумажных письмах обязательно указывайте свой обратный адрес
+            разборчивым почерком — без этого волшебникам сложнее найти дорогу к вашему почтовому ящику.
+          </div>
+        </section>
+
+        <!-- Как написать письмо -->
+        <section class="section" id="how-to">
+          <div class="badge">
+            <span>🪄</span>
+            <span>Как написать письмо зимнему волшебнику</span>
+          </div>
+          <h2>О чем можно написать в письме</h2>
+          <p>
+            Письмо волшебнику — это не отчет и не список задач. Это несколько строк про вас, ваш год
+            и то, чего вам сейчас особенно хочется.
+          </p>
+          <ul class="tips-list">
+            <li>За что вы благодарны в этом году (минимум три небольших «спасибо»).</li>
+            <li>Какие мечты и планы хотите аккуратно подтолкнуть в следующем году.</li>
+            <li>Чему вы научились за этот год и чем тихо гордитесь.</li>
+            <li>Какую маленькую добрую привычку хотите привнести в свою жизнь.</li>
+            <li>Какую поддержку вы бы хотели попросить у волшебника (не обязательно материальную).</li>
+          </ul>
+
+          <p class="tips-subtitle"><strong>Небольшие подсказки по стилю:</strong></p>
+          <ul class="tips-list">
+            <li>Пишите от первого лица: «я чувствую», «я мечтаю», «я хочу попробовать».</li>
+            <li>Не обязательно просить подарки — можно попросить сил, вдохновения или спокойствия.</li>
+            <li>Письмо может быть очень коротким, главное — чтобы оно было честным.</li>
+            <li>Язык любой: можно писать по-русски, по-английски или смешивать, как удобно.</li>
+            <li>Если отправляете письмо по почте, добавьте рисунок, наклейку или маленький символ года — это всегда вызывает улыбку.</li>
+          </ul>
+
+          <p class="tips-subtitle">
+            Важнее всего не то, дойдет ли письмо до конкретного адреса, а то, что вы остановились
+            на пару минут и честно сформулировали свои желания. Это уже немного волшебство.
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

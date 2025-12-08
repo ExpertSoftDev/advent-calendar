@@ -2,55 +2,59 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Адвент Expert Soft — новогодний плейлист</title>
+<title>Адвент Expert Soft — Новогодний плейлист</title>
+
 <style>
     body {
         margin: 0;
         font-family: Arial, sans-serif;
         color: #fff;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)),
-                    url("images/fon-saita.png") center/cover no-repeat fixed;
+        min-height: 100vh;
+        background:
+            linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.85)),
+            url("images/newyear-bg.jpg") center/cover no-repeat fixed;
     }
 
     .container {
-        max-width: 900px;
+        max-width: 1000px;
         margin: 0 auto;
-        padding: 40px 20px;
+        padding: 50px 20px 80px;
     }
 
     h1 {
         text-align: center;
-        font-size: 42px;
+        font-size: 46px;
         margin-bottom: 10px;
-        text-shadow: 0 0 10px #000;
+        text-shadow: 0 0 12px #000;
     }
 
     h2.section-title {
         text-align: center;
         font-size: 26px;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
         text-shadow: 0 0 10px #000;
     }
 
     .playlist-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 40px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+        margin-top: 30px;
     }
 
     .playlist-card {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 20px;
-        border-radius: 16px;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        padding: 25px 20px;
         text-align: center;
-        transition: 0.3s;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 0 12px rgba(0,0,0,0.45);
+        transition: 0.25s;
     }
 
     .playlist-card:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.22);
+        transform: translateY(-4px);
     }
 
     .playlist-card h3 {
@@ -59,50 +63,65 @@
         text-shadow: 0 0 10px #000;
     }
 
-    .playlist-card a {
+    .playlist-card a.button {
         display: inline-block;
-        margin-top: 12px;
-        background: rgba(255,255,255,0.2);
-        padding: 10px 16px;
-        border-radius: 10px;
-        color: #fff;
-        text-decoration: none;
+        padding: 10px 18px;
+        background: rgba(255,255,255,0.8);
+        color: #000;
         font-weight: bold;
-        backdrop-filter: blur(3px);
-        transition: 0.25s;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: 0.2s;
+        margin-top: 12px;
     }
 
-    .playlist-card a:hover {
-        background: rgba(255,255,255,0.35);
+    .playlist-card a.button:hover {
+        background: #fff;
     }
+
 </style>
 </head>
+
 <body>
 <div class="container">
 
-    <h1>Адвент Expert Soft</h1>
-    <h2 class="section-title">Новогодний плейлист — выберите свою атмосферу</h2>
+    <h1>Новогодний плейлист</h1>
+    <h2 class="section-title">Выберите настроение и включайте музыку 🎧✨</h2>
 
     <div class="playlist-grid">
+
+        <!-- Классика -->
         <div class="playlist-card">
-            <h3>❄️ Новогодняя классика</h3>
-            <a href="PLAYLIST_LINK_CLASSIC" target="_blank">Открыть плейлист</a>
+            <h3>🎄 Классика праздника</h3>
+            <a class="button" href="PLAYLIST_LINK_CLASSIC" target="_blank">
+                Открыть плейлист
+            </a>
         </div>
 
+        <!-- Уют -->
         <div class="playlist-card">
-            <h3>🕯 Уютная зимняя атмосфера</h3>
-            <a href="PLAYLIST_LINK_COZY" target="_blank">Открыть плейлист</a>
+            <h3>🕯 Уют и тепло</h3>
+            <a class="button" href="PLAYLIST_LINK_COZY" target="_blank">
+                Открыть плейлист
+            </a>
         </div>
 
+        <!-- Современное -->
         <div class="playlist-card">
-            <h3>🎧 Совремённый новогодний вайб</h3>
-            <a href="PLAYLIST_LINK_MODERN" target="_blank">Открыть плейлист</a>
+            <h3>⭐ Современный новогодний</h3>
+            <a class="button" href="PLAYLIST_LINK_MODERN" target="_blank">
+                Открыть плейлист
+            </a>
         </div>
 
+        <!-- Вечеринка -->
         <div class="playlist-card">
-            <h3>🎉 Праздничная вечеринка</h3>
-            <a href="PLAYLIST_LINK_PARTY" target="_blank">Открыть плейлист</a>
+            <h3>🎉 Для новогодней вечеринки</h3>
+            <a class="button" href="PLAYLIST_LINK_PARTY" target="_blank">
+                Открыть плейлист
+            </a>
         </div>
+
     </div>
 
 </div>

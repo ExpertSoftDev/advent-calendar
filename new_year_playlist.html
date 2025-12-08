@@ -11,8 +11,8 @@
         color: #fff;
         min-height: 100vh;
         background:
-            linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.85)),
-            url("images/newyear-bg.jpg") center/cover no-repeat fixed;
+            linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.85)),
+            url("images/newyear-bright.jpg") center/cover no-repeat fixed;
     }
 
     .container {
@@ -26,30 +26,35 @@
         font-size: 46px;
         margin-bottom: 10px;
         text-shadow: 0 0 12px #000;
+        font-weight: bold;
     }
 
     h2.section-title {
         text-align: center;
-        font-size: 26px;
-        margin-bottom: 40px;
+        font-size: 28px;
+        margin-bottom: 35px;
         text-shadow: 0 0 10px #000;
     }
 
     .playlist-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 24px;
-        margin-top: 30px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+        margin-top: 40px;
     }
 
     .playlist-card {
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 18px;
-        padding: 25px 20px;
+        background: rgba(255, 255, 255, 0.13);
+        border-radius: 20px;
+        padding: 30px 25px;
         text-align: center;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 0 12px rgba(0,0,0,0.45);
+        backdrop-filter: blur(5px);
+        box-shadow: 0 0 14px rgba(0,0,0,0.45);
         transition: 0.25s;
+        min-height: 180px; /* одинаковая высота */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .playlist-card:hover {
@@ -59,34 +64,39 @@
 
     .playlist-card h3 {
         margin-top: 0;
-        font-size: 22px;
+        font-size: 24px;
         text-shadow: 0 0 10px #000;
     }
 
     .playlist-card a.button {
         display: inline-block;
-        padding: 10px 18px;
-        background: rgba(255,255,255,0.8);
-        color: #000;
+        padding: 12px 20px;
+        background: rgba(255,255,255,0.9);
+        color: #b20000;
         font-weight: bold;
-        border-radius: 10px;
+        border-radius: 12px;
         text-decoration: none;
         transition: 0.2s;
-        margin-top: 12px;
+        margin-top: 18px;
     }
 
     .playlist-card a.button:hover {
         background: #fff;
     }
 
+    @media (max-width: 700px) {
+        .playlist-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 </head>
 
 <body>
 <div class="container">
 
-    <h1>Новогодний плейлист</h1>
-    <h2 class="section-title">Выберите настроение и включайте музыку 🎧✨</h2>
+    <h1>Адвент Expert Soft</h1>
+    <h2 class="section-title">Новогодний плейлист — создаём настроение 🎧✨</h2>
 
     <div class="playlist-grid">
 
@@ -106,7 +116,7 @@
             </a>
         </div>
 
-        <!-- Современное -->
+        <!-- Современный -->
         <div class="playlist-card">
             <h3>⭐ Современный новогодний</h3>
             <a class="button" href="PLAYLIST_LINK_MODERN" target="_blank">

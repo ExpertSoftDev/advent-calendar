@@ -13,12 +13,15 @@
             linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.75)),
             url("images/newyear-bright.jpg") center/cover no-repeat fixed;
         min-height: 100vh;
+        overflow-x: hidden;
     }
 
     .container {
         max-width: 900px;
         margin: 0 auto;
         padding: 30px 20px 40px;
+        position: relative;
+        z-index: 1;
     }
 
     h1 {
@@ -40,10 +43,13 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 16px;
+        position: relative;
+        z-index: 1;
     }
 
     .playlist-card {
         background: rgba(255, 255, 255, 0.18);
+        border: 2px solid rgba(255, 255, 255, 0.35); /* праздничный бордюр */
         border-radius: 16px;
         padding: 20px 16px;
         text-align: center;
@@ -53,13 +59,14 @@
         min-height: 150px;
         display: flex;
         flex-direction: column;
-        justify-content: space-around; /* равномерное распределение */
+        justify-content: space-around;
         align-items: center;
     }
 
     .playlist-card:hover {
         background: rgba(255, 255, 255, 0.28);
         transform: translateY(-3px);
+        box-shadow: 0 0 14px rgba(0,0,0,0.55);
     }
 
     .playlist-card h3 {
@@ -87,6 +94,26 @@
         background: #fff;
     }
 
+    /* Анимация снежинок */
+    .snowflake {
+        position: fixed;
+        top: -10px;
+        color: #fff;
+        font-size: 12px;
+        z-index: 0;
+        user-select: none;
+        pointer-events: none;
+        animation-name: fall;
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    }
+
+    @keyframes fall {
+        0% { transform: translateY(-10px) rotate(0deg); }
+        100% { transform: translateY(110vh) rotate(360deg); }
+    }
+
     @media (max-width: 700px) {
         .playlist-grid {
             grid-template-columns: 1fr;
@@ -102,7 +129,6 @@
     <h2 class="section-title">Новогодний плейлист — создаём настроение 🎧✨</h2>
 
     <div class="playlist-grid">
-
         <div class="playlist-card">
             <h3>🎄 Классика праздника</h3>
             <a class="button" href="PLAYLIST_LINK_CLASSIC" target="_blank">Слушать на YouTube</a>
@@ -122,9 +148,22 @@
             <h3>🎉 Вечеринка</h3>
             <a class="button" href="PLAYLIST_LINK_PARTY" target="_blank">Слушать на YouTube</a>
         </div>
-
     </div>
 
 </div>
+
+<!-- Снежинки -->
+<script>
+    const snowCount = 35;
+    for(let i = 0; i < snowCount; i++) {
+        const snow = document.createElement('div');
+        snow.className = 'snowflake';
+        snow.style.left = Math.random() * 100 + 'vw';
+        snow.style.animationDuration = (5 + Math.random() * 7) + 's';
+        snow.style.fontSize = (10 + Math.random() * 15) + 'px';
+        snow.textContent = '❄';
+        document.body.appendChild(snow);
+    }
+</script>
 </body>
 </html>

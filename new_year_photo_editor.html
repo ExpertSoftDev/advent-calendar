@@ -81,21 +81,19 @@
 const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
 let mainPhoto = null;
 
-// Загрузка фото
+// Функция загрузки фото
 document.getElementById('upload').addEventListener('change', function(e){
   const reader = new FileReader();
   reader.onload = function(event){
-    const imgObj = new Image();
-    imgObj.src = event.target.result;
-    imgObj.onload = function() {
-      const img = new fabric.Image(imgObj);
-      img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable: true });
+    fabric.Image.fromURL(event.target.result, function(img){
+      img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
       img.scaleToWidth(canvas.width);
       mainPhoto = img;
       canvas.clear();
       canvas.add(img);
       canvas.sendToBack(img);
-    }
+      canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
   }
   reader.readAsDataURL(e.target.files[0]);
 });
@@ -103,30 +101,32 @@ document.getElementById('upload').addEventListener('change', function(e){
 // Добавление рамки
 function addFrame(url){
   fabric.Image.fromURL(url, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable: true });
+    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
     img.scaleToWidth(canvas.width);
     canvas.add(img);
     canvas.setActiveObject(img);
-  });
+    canvas.renderAll();
+  }, { crossOrigin: 'anonymous' });
 }
 
 // Добавление украшений
 function addDecoration(url){
   fabric.Image.fromURL(url, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable: true });
+    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
     img.scale(0.2);
     canvas.add(img);
     canvas.setActiveObject(img);
-  });
+    canvas.renderAll();
+  }, { crossOrigin: 'anonymous' });
 }
 
-// Фильтры
+// Применение фильтров к основному фото
 function applyFilter(){
   if(!mainPhoto) return;
   const filter = document.getElementById('filterSelect').value;
   mainPhoto.filters = [];
   if(filter === 'warm'){
-    mainPhoto.filters.push(new fabric.Image.filters.Tint({ color: '#ffdfba', opacity: 0.3 }));
+    mainPhoto.filters.push(new fabric.Image.filters.Tint({ color: '#ffdfba', opacity:0.3 }));
   } else if(filter === 'vintage'){
     mainPhoto.filters.push(new fabric.Image.filters.Sepia());
   } else if(filter === 'grayscale'){
@@ -140,32 +140,37 @@ function applyFilter(){
 function deleteObject(){
   const active = canvas.getActiveObject();
   if(active){
+    if(active === mainPhoto) mainPhoto = null;
     canvas.remove(active);
+    canvas.renderAll();
   }
 }
 
-// Скачивание результата
+// Скачивание итогового изображения
 function downloadImage(){
+  // Делаем временный рендер
+  const dataURL = canvas.toDataURL({ format:'png', multiplier:2 });
   const link = document.createElement('a');
-  link.href = canvas.toDataURL({ format: 'png' });
+  link.href = dataURL;
   link.download = 'newyear_photo.png';
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 }
 
 // Масштабирование основного фото колесиком мыши
 canvas.on('mouse:wheel', function(opt){
+  if(!mainPhoto) return;
   const delta = opt.e.deltaY;
-  if(mainPhoto){
-    let scale = mainPhoto.scaleX - delta/500;
-    scale = Math.max(0.1, Math.min(5, scale));
-    mainPhoto.scale(scale);
-    canvas.renderAll();
-    opt.e.preventDefault();
-    opt.e.stopPropagation();
-  }
+  let scale = mainPhoto.scaleX - delta/500;
+  scale = Math.max(0.1, Math.min(5, scale));
+  mainPhoto.scale(scale);
+  canvas.renderAll();
+  opt.e.preventDefault();
+  opt.e.stopPropagation();
 });
 
-// Позволяем перемещать и масштабировать объекты
+// Перетаскивание и масштабирование объектов
 canvas.on('object:moving', function(e){ e.target.setCoords(); });
 canvas.on('object:scaling', function(e){ e.target.setCoords(); });
 </script>

@@ -1,522 +1,201 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>🎄 Новогодний фото-редактор</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎄 Новогодний фото-редактор 🎄</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 <style>
-  :root{
-    --panel-bg: rgba(10,18,30,0.56);
-    --accent: #ffd966;
-    --muted: rgba(255,255,255,0.85);
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #0a1f2f, #1a3b5f);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #fff;
   }
-  html,body{height:100%;margin:0;font-family:Inter,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#071428 0%, #102d49 60%, #1f4a6a 100%);color:var(--muted);}
-  /* decorative background */
-  body::before{
-    content:"";
-    position:fixed;inset:0;
-    background-image: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.03), transparent 6%),
-                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.02), transparent 8%);
-    pointer-events:none;
-    z-index:0;
+  h1 {
+    text-shadow: 2px 2px 6px #000;
+    margin-bottom: 10px;
   }
-  .wrap{position:relative;z-index:1;max-width:1100px;margin:24px auto;padding:18px;display:flex;gap:18px;align-items:flex-start;}
-  .title{
-    display:flex;align-items:center;gap:12px;margin-bottom:10px;
+  .editor-container {
+    position: relative;
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  h1{margin:0;font-size:20px;letter-spacing:0.2px}
-  .left{
-    background:var(--panel-bg);backdrop-filter: blur(6px);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+  canvas {
+    border: 3px solid #fff;
+    border-radius: 15px;
+    cursor: grab;
   }
-  canvas{border-radius:12px;border:2px solid rgba(255,255,255,0.08);background:#0b2234}
-  .controls{display:flex;flex-direction:column;gap:12px;margin-top:12px;width:320px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{
-    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 10px;border-radius:10px;cursor:pointer;font-size:13px;
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
   }
-  .btn:hover{box-shadow:0 4px 14px rgba(0,0,0,0.4);transform:translateY(-2px)}
-  .file-input{display:flex;gap:8px;align-items:center}
-  input[type="file"]{display:block;color:transparent}
-  .thumbs{display:flex;gap:8px;flex-wrap:wrap;max-height:160px;overflow:auto;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
-  .thumb{width:70px;height:70px;border-radius:8px;border:1px dashed rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
-  .thumb img{width:100%;height:100%;object-fit:contain;pointer-events:none}
-  .bottom-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px}
-  select{padding:8px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-  .hint{font-size:13px;color:rgba(255,255,255,0.7)}
-  /* snow */
-  .snowflake{position:fixed;z-index:0;pointer-events:none;font-size:14px;opacity:0.9}
-  /* responsive */
-  @media (max-width:980px){.wrap{flex-direction:column;align-items:center}.controls{width:100%;max-width:700px}}
+  button, input[type="file"], select {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    transition: 0.3s;
+  }
+  button:hover, select:hover {
+    background-color: rgba(255, 215, 0, 0.7);
+  }
+  /* Снежинки */
+  .snowflake {
+    position: absolute;
+    top: -10px;
+    color: #fff;
+    user-select: none;
+    pointer-events: none;
+    font-size: 10px;
+    animation-name: fall;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(700px); }
+  }
 </style>
 </head>
 <body>
-  <div style="display:flex;justify-content:center;margin-top:18px">
-    <div class="title">
-      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect rx='6' width='36' height='36' fill='%23fff0b3'/><text x='50%' y='56%' font-size='20' text-anchor='middle' fill='%23062b3b' font-family='Arial' font-weight='700'>NY</text></svg>" alt="" style="width:44px;height:44px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.35)"/>
-      <div>
-        <h1>Новогодний фото-редактор</h1>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75)">Добавляй украшения, рамки, фильтры — скачивай готовое фото</div>
-      </div>
-    </div>
+<h1>🎄 Новогодний фото-редактор 🎄</h1>
+<div class="editor-container">
+  <canvas id="canvas" width="600" height="600"></canvas>
+  <div class="controls">
+    <input type="file" id="upload" accept="image/*">
+    <button onclick="addFrame('https://i.ibb.co/0mXvX7r/snowframe.png')">Добавить рамку ❄️</button>
+    <button onclick="addDecoration('https://i.ibb.co/8bXv5fP/santa-hat.png')">Шапка Деда Мороза 🎅</button>
+    <button onclick="addDecoration('https://i.ibb.co/1J2c5n5/elf-hat.png')">Шапка эльфа 🧝</button>
+    <button onclick="addDecoration('https://i.ibb.co/7kPrKqG/garland.png')">Гирлянда 🎀</button>
+    <button onclick="addDecoration('https://i.ibb.co/zsDk7gk/ball.png')">Новогодний шар 🎈</button>
+    <select id="filterSelect" onchange="applyFilter()">
+      <option value="">Без фильтра</option>
+      <option value="vintage">Винтаж 📷</option>
+      <option value="grayscale">Ч/Б ⚫⚪</option>
+    </select>
+    <button onclick="deleteObject()">Удалить выбранное 🗑️</button>
+    <button onclick="downloadImage()">Скачать фото 💾</button>
   </div>
-
-  <div class="wrap" role="application">
-    <div class="left">
-      <canvas id="c" width="720" height="720"></canvas>
-
-      <div style="display:flex;gap:12px;margin-top:12px;width:720px;justify-content:space-between;align-items:center">
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn" id="bringForward">Вперед</button>
-          <button class="btn" id="sendBack">Назад</button>
-          <button class="btn" id="center">Центр</button>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="hint">Колесо мыши — масштаб фото</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="controls" aria-label="Панель управления">
-      <div class="file-input">
-        <label class="btn" style="display:inline-flex;align-items:center;gap:8px">
-          <span>Загрузить фото</span>
-          <input id="file" type="file" accept="image/*" />
-        </label>
-        <button class="btn" id="download">Скачать</button>
-      </div>
-
-      <div>
-        <div style="font-size:14px;margin-bottom:6px">Рамки</div>
-        <div class="thumbs" id="framesList" aria-hidden="false">
-          <!-- thumbs added by script -->
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:14px;margin-bottom:6px">Украшения</div>
-        <div class="thumbs" id="decorList"></div>
-      </div>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="filterSelect" title="Фильтр для фото">
-          <option value="">Без фильтра</option>
-          <option value="warm">Тёплый</option>
-          <option value="vintage">Винтаж</option>
-          <option value="grayscale">Ч/Б</option>
-        </select>
-        <button class="btn" id="removeFilter">Снять фильтр</button>
-      </div>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn" id="delete">Удалить выбранное</button>
-        <div class="hint">Или нажми клавишу <strong>Delete</strong></div>
-      </div>
-
-      <div style="margin-top:6px;font-size:13px;color:rgba(255,255,255,0.75)">
-        Подсказка: клик по миниатюре — добавить объект. Выдели объект, чтобы перемещать или масштабировать (контрольные маркеры).
-      </div>
-    </div>
-  </div>
+</div>
 
 <script>
-/*
-  Полностью автономный редактор.
-  Минималистичные SVG/PNG для рамок и украшений встроены как data-URI.
-  Fabric.js используется для работы с canvas.
-*/
-
-const canvas = new fabric.Canvas('c', { preserveObjectStacking: true, selection: true, backgroundColor: 'transparent' });
-canvas.renderOnAddRemove = true;
-canvas.skipTargetFind = false;
-
-// --- small decorative images as compact data-URIs (SVGs) ---
-// They are intentionally simple SVGs so base64 is small and crossOrigin not needed.
-// You can replace these URIs with larger base64 PNGs if you want more detailed decorations.
-
-const assets = {
-  frames: [
-    { id:'frame-snow', name:'Снежная рамка', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200' viewBox='0 0 1200 1200'>
-        <rect width='1200' height='1200' fill='none'/>
-        <g fill='none' stroke='%23ffffff' stroke-opacity='0.9' stroke-width='28'>
-          <rect x='14' y='14' width='1172' height='1172' rx='40' stroke-linejoin='round'/>
-        </g>
-        <g fill='%23ffffff' opacity='0.9'>
-          <circle cx='1100' cy='100' r='12'/>
-          <circle cx='1030' cy='180' r='8'/>
-          <circle cx='200' cy='1000' r='10'/>
-          <circle cx='1000' cy='1000' r='8'/>
-        </g>
-      </svg>`},
-    { id:'frame-garland', name:'Рамка-гирлянда', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200' viewBox='0 0 1200 1200'>
-        <rect width='1200' height='1200' fill='none'/>
-        <path d='M20 120h1160v960H20z' fill='none' stroke='%23f4e0b7' stroke-width='22' rx='30'/>
-        <g transform='translate(40,40)' fill='%23ff6b6b'>
-          <circle cx='80' cy='60' r='12'/>
-          <circle cx='160' cy='40' r='10'/>
-          <circle cx='240' cy='70' r='12'/>
-          <circle cx='320' cy='50' r='10'/>
-        </g>
-      </svg>`}
-  ],
-  decorations: [
-    { id:'hat-santa', name:'Шапка Деда Мороза', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='240' height='180' viewBox='0 0 240 180'>
-        <g>
-          <path d='M12 110 C60 10, 200 10, 228 110 Z' fill='%23d62828'/>
-          <ellipse cx='40' cy='102' rx='26' ry='18' fill='%23fff'/>
-          <ellipse cx='180' cy='102' rx='28' ry='18' fill='%23fff'/>
-          <circle cx='198' cy='60' r='18' fill='%23fff'/>
-        </g>
-      </svg>`},
-    { id:'hat-elf', name:'Шапка эльфа', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='220' height='160' viewBox='0 0 220 160'>
-        <g>
-          <path d='M8 100 C50 10, 170 10, 210 100 Z' fill='%2335a853'/>
-          <ellipse cx='40' cy='94' rx='24' ry='15' fill='%23fff'/>
-          <circle cx='200' cy='40' r='10' fill='%23ffd166'/>
-        </g>
-      </svg>`},
-    { id:'ball-red', name:'Шар красный', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'>
-        <circle cx='70' cy='70' r='48' fill='%23c1121f'/>
-        <circle cx='48' cy='48' r='12' fill='%23ffb3b3' opacity='0.9'/>
-        <rect x='62' y='18' width='16' height='12' rx='3' fill='%238b0000'/>
-      </svg>`},
-    { id:'ball-blue', name:'Шар синий', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'>
-        <circle cx='70' cy='70' r='48' fill='%231b6ca8'/>
-        <circle cx='52' cy='52' r='10' fill='%23dff0ff' opacity='0.9'/>
-        <rect x='62' y='18' width='16' height='12' rx='3' fill='%230e4a6b'/>
-      </svg>`},
-    { id:'garland', name:'Гирлянда', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='280' height='120' viewBox='0 0 280 120'>
-        <path d='M0 40 C40 10, 80 70, 120 40 C160 10,200 70,240 40 C280 10,320 70,360 40' stroke='%23ffd166' stroke-width='6' fill='none' stroke-linecap='round'/>
-        <circle cx='60' cy='46' r='8' fill='%23ff6b6b' /><circle cx='120' cy='46' r='8' fill='%2335a853'/><circle cx='180' cy='46' r='8' fill='%231b6ca8'/>
-      </svg>`},
-    { id:'snowflake', name:'Снежинка', uri: `data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'>
-        <g stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'>
-          <path d='M60 16 L60 104'/>
-          <path d='M16 60 L104 60'/>
-          <path d='M28 28 L92 92'/><path d='M28 92 L92 28'/>
-        </g>
-      </svg>`}
-  ],
-  // background image (larger, but not huge) embedded as SVG gradient + subtle stars
-  background: `data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080' viewBox='0 0 1920 1080'>
-      <defs>
-        <linearGradient id='g' x1='0' x2='0' y1='0' y2='1'>
-          <stop offset='0' stop-color='%23031b2b' /><stop offset='1' stop-color='%23193d57'/>
-        </linearGradient>
-      </defs>
-      <rect width='100%' height='100%' fill='url(%23g)'/>
-      <g fill='%23ffffff' opacity='0.06'>
-        <circle cx='120' cy='140' r='2'/><circle cx='360' cy='40' r='1.2'/><circle cx='960' cy='60' r='1.5'/>
-        <circle cx='1500' cy='120' r='1.1'/><circle cx='1700' cy='300' r='1.4'/><circle cx='300' cy='800' r='1.3'/>
-      </g>
-    </svg>`
-};
-
-// apply background to body (decorative)
-document.body.style.backgroundImage = `url("${assets.background}")`;
-
-// --- build thumbnails UI ---
-const framesList = document.getElementById('framesList');
-const decorList = document.getElementById('decorList');
-
-function createThumb(item, isDecoration){
-  const d = document.createElement('div');
-  d.className = 'thumb';
-  d.title = item.name;
-  const img = document.createElement('img');
-  img.src = item.uri;
-  d.appendChild(img);
-  d.addEventListener('click', ()=>{
-    if(isDecoration) addDecoration(item.uri);
-    else addFrame(item.uri);
-  });
-  return d;
-}
-
-assets.frames.forEach(f=> framesList.appendChild(createThumb(f,false)));
-assets.decorations.forEach(d=> decorList.appendChild(createThumb(d,true)));
-
-// --- Main photo object reference ---
+const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
 let mainPhoto = null;
 
-// Helper to keep object selectable and on top/back as required
-function addFrame(uri){
-  fabric.Image.fromURL(uri, function(img){
-    // scale to canvas size for frame (cover)
-    const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true, hoverCursor:'move' });
-    img.scale(scale);
-    img.hasControls = true;
-    img.name = 'frame';
-    // make sure frame sits above photo by default
-    canvas.add(img);
-    canvas.bringToFront(img);
-    canvas.setActiveObject(img);
-    canvas.requestRenderAll();
-  });
-}
-
-function addDecoration(uri){
-  fabric.Image.fromURL(uri, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true, hoverCursor:'move' });
-    img.scaleToWidth(140);
-    img.name = 'decoration';
-    canvas.add(img);
-    canvas.setActiveObject(img);
-    canvas.requestRenderAll();
-  });
-}
-
-// load user photo
-const fileInput = document.getElementById('file');
-fileInput.addEventListener('change', (ev)=>{
-  const f = ev.target.files && ev.target.files[0];
-  if(!f) return;
+// Функция загрузки фото
+document.getElementById('upload').addEventListener('change', function(e){
   const reader = new FileReader();
-  reader.onload = function(e){
-    fabric.Image.fromURL(e.target.result, function(img){
-      // ensure it fits into canvas while preserving aspect
-      const maxW = canvas.width;
-      const maxH = canvas.height;
-      const scale = Math.min(maxW / img.width, maxH / img.height);
-      img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true, hasControls:true });
-      img.scale(scale);
-      img.name = 'photo';
-      // remove previous main photo but keep decorations/frames
-      // we want new photo to be under all frames/decorations
-      if(mainPhoto){
-        // remove old photo
-        try{ canvas.remove(mainPhoto);}catch(e){}
-      }
+  reader.onload = function(event){
+    fabric.Image.fromURL(event.target.result, function(img){
+      img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
+      img.scaleToWidth(canvas.width);
       mainPhoto = img;
+      canvas.clear();
       canvas.add(img);
       canvas.sendToBack(img);
-      canvas.requestRenderAll();
+      canvas.renderAll();
     }, { crossOrigin: 'anonymous' });
-  };
-  reader.readAsDataURL(f);
+  }
+  reader.readAsDataURL(e.target.files[0]);
 });
 
-// Filters
-const filterSelect = document.getElementById('filterSelect');
-const removeFilterBtn = document.getElementById('removeFilter');
+// Добавление рамки
+function addFrame(url){
+  fabric.Image.fromURL(url, function(img){
+    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
+    img.scaleToWidth(canvas.width);
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+  }, { crossOrigin: 'anonymous' });
+}
 
-function applyFilterByName(name){
+// Добавление украшений
+function addDecoration(url){
+  fabric.Image.fromURL(url, function(img){
+    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
+    img.scale(0.2);
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+  }, { crossOrigin: 'anonymous' });
+}
+
+// Применение фильтров
+function applyFilter(){
   if(!mainPhoto) return;
-  mainPhoto.filters = []; // reset
-  if(name === 'vintage'){
+  const filter = document.getElementById('filterSelect').value;
+  mainPhoto.filters = [];
+  if(filter === 'vintage'){
     mainPhoto.filters.push(new fabric.Image.filters.Sepia());
-    // subtle contrast/brightness to taste
-    mainPhoto.filters.push(new fabric.Image.filters.Brightness({brightness:0.03}));
-    mainPhoto.filters.push(new fabric.Image.filters.Contrast({ contrast: 0.04 }));
-  } else if(name === 'grayscale'){
+  } else if(filter === 'grayscale'){
     mainPhoto.filters.push(new fabric.Image.filters.Grayscale());
-  } else if(name === 'warm'){
-    // combine slight brightness + saturation to warm the look
-    // Fabric lacks a direct 'warm' so we emulate with Saturation + Brightness + Tint via BlendColor if supported.
-    try {
-      mainPhoto.filters.push(new fabric.Image.filters.Brightness({brightness:0.03}));
-      mainPhoto.filters.push(new fabric.Image.filters.Saturation({saturation:0.14}));
-      // BlendColor might not be present in all builds; attempt and ignore if fails
-      if (fabric.Image.filters && fabric.Image.filters.BlendColor) {
-        mainPhoto.filters.push(new fabric.Image.filters.BlendColor({color:'#ffdfba', mode:'multiply', alpha:0.14}));
-      }
-    } catch(e){
-      // fallback: only brightness/saturation applied
-    }
   }
   mainPhoto.applyFilters();
-  canvas.requestRenderAll();
+  canvas.renderAll();
 }
 
-filterSelect.addEventListener('change', ()=> {
-  const v = filterSelect.value;
-  applyFilterByName(v);
-});
-
-removeFilterBtn.addEventListener('click', ()=>{
-  filterSelect.value = '';
-  if(mainPhoto){
-    mainPhoto.filters = [];
-    mainPhoto.applyFilters();
-    canvas.requestRenderAll();
+// Удаление выбранного объекта
+function deleteObject(){
+  const active = canvas.getActiveObject();
+  if(active){
+    if(active === mainPhoto) mainPhoto = null;
+    canvas.remove(active);
+    canvas.renderAll();
   }
-});
+}
 
-// delete selected
-document.getElementById('delete').addEventListener('click', ()=>{
-  const a = canvas.getActiveObject();
-  if(a){
-    if(a === mainPhoto) mainPhoto = null;
-    canvas.remove(a);
-    canvas.discardActiveObject();
-    canvas.requestRenderAll();
-  }
-});
-window.addEventListener('keydown',(e)=>{
-  if(e.key === 'Delete' || e.key === 'Backspace'){
-    const a = canvas.getActiveObject();
-    if(a){
-      if(a === mainPhoto) mainPhoto = null;
-      canvas.remove(a);
-      canvas.discardActiveObject();
-      canvas.requestRenderAll();
-    }
-  }
-});
-
-// bring forward / send back
-document.getElementById('bringForward').addEventListener('click', ()=>{
-  const a = canvas.getActiveObject();
-  if(a) canvas.bringForward(a);
-});
-document.getElementById('sendBack').addEventListener('click', ()=>{
-  const a = canvas.getActiveObject();
-  if(a) canvas.sendBackwards(a);
-});
-document.getElementById('center').addEventListener('click', ()=>{
-  const a = canvas.getActiveObject();
-  if(a){
-    a.set({ left: canvas.width/2, top: canvas.height/2 });
-    a.setCoords();
-    canvas.requestRenderAll();
-  }
-});
-
-// download
-document.getElementById('download').addEventListener('click', ()=>{
-  // ensure rendering finished
-  canvas.discardActiveObject();
-  canvas.requestRenderAll();
-  // toDataURL may fail if images are tainted. We used data-URIs and same-origin, so OK.
-  const data = canvas.toDataURL({ format: 'png', multiplier: 2 });
+// Скачивание итогового изображения
+function downloadImage(){
+  const dataURL = canvas.toDataURL({ format:'png', multiplier:2 });
   const link = document.createElement('a');
-  link.href = data;
+  link.href = dataURL;
   link.download = 'newyear_photo.png';
-  document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
-});
-
-// mouse wheel: scale main photo (or scale currently selected photo if it is mainPhoto)
-canvas.on('mouse:wheel', function(opt){
-  const e = opt.e;
-  e.preventDefault();
-  e.stopPropagation();
-  const delta = e.deltaY;
-  // If user has selected a photo object (mainPhoto) scale it. Otherwise if mainPhoto exists and not selected, scale it.
-  let target = canvas.getActiveObject();
-  if(!target) target = mainPhoto;
-  if(!target) return;
-  // restrict to only scale the photo if it is mainPhoto OR the active object is mainPhoto
-  // But if user selected a decoration & wants to scale it with wheel, allow that too:
-  const scaleFactor = 1 - delta / 600;
-  const newScale = Math.max(0.05, Math.min(8, target.scaleX * scaleFactor));
-  target.scale(newScale);
-  target.setCoords();
-  canvas.requestRenderAll();
-});
-
-// touch: simple pinch to zoom handled by fabric controls; no extra code required for basic pinch scaling on mobile
-
-// avoid filters clipping: when filters applied, ensure object origin and scaling is preserved. We always use scale(), not scaleToWidth except for decorations.
-
-// ensure objects are selectable and have controls
-canvas.on('object:added', (e)=>{
-  const obj = e.target;
-  obj.setControlsVisibility({
-    mt: true, // middle top
-    mb: true,
-    ml: true,
-    mr: true,
-    bl: true, // bottom-left
-    br: true, // bottom-right
-    tl: true,
-    tr: true,
-    mtr: true // rotate control
-  });
-  obj.lockUniScaling = false;
-  obj.transparentCorners = false;
-});
-
-// prevent accidental deselect on canvas click (clicking empty area clears selection)
-canvas.on('mouse:down', function(e){
-  // if clicked empty space, do nothing special
-});
-
-// make sure canvas sizes nicely on mobile
-function resizeCanvas(){
-  const container = document.querySelector('.left');
-  const maxWidth = Math.min(window.innerWidth - 60, 780);
-  const size = Math.min(maxWidth, 720);
-  const cvs = document.getElementById('c');
-  cvs.width = size;
-  cvs.height = size;
-  canvas.setWidth(size);
-  canvas.setHeight(size);
-  // re-center existing objects if any (best-effort)
-  canvas.getObjects().forEach(obj=>{
-    if(obj && obj.left === undefined) return;
-    // keep in bounds
-    if(obj.left > canvas.width) obj.left = canvas.width/2;
-    if(obj.top > canvas.height) obj.top = canvas.height/2;
-    obj.setCoords();
-  });
-  canvas.requestRenderAll();
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas(); // initial
 
-// small festive snow animation (DOM)
-(function makeSnow(){
-  const n = 40;
-  for(let i=0;i<n;i++){
-    const s = document.createElement('div');
-    s.className = 'snowflake';
-    s.style.left = Math.random()*100 + 'vw';
-    s.style.top = -Math.random()*40 + 'vh';
-    s.style.fontSize = (8 + Math.random()*22)+'px';
-    s.style.opacity = (0.3 + Math.random()*0.7);
-    const dur = 6 + Math.random()*8;
-    s.style.transition = `transform ${dur}s linear`;
-    s.textContent = '❄';
-    document.body.appendChild(s);
-    // animate
-    (function(el,delay,dur){
-      setTimeout(()=>{
-        el.style.transform = `translateY(${window.innerHeight + 120}px) translateX(${(Math.random()-0.5)*200}px)`;
-        // fade out
-        el.style.opacity = 0.05;
-      }, delay);
-      // remove and re-add to loop
-      setInterval(()=>{
-        el.style.transition = 'none';
-        el.style.transform = `translateY(${-50 - Math.random()*80}px) translateX(0px)`;
-        el.style.opacity = (0.3 + Math.random()*0.7);
-        // force reflow
-        void el.offsetWidth;
-        el.style.transition = `transform ${dur}s linear`;
-        setTimeout(()=> el.style.transform = `translateY(${window.innerHeight + 120}px) translateX(${(Math.random()-0.5)*200}px)`, 50);
-      }, (dur+1)*1000 + Math.random()*4000);
-    })(s, Math.random()*4000, 6+Math.random()*6);
-  }
-})();
+// Масштабирование основного фото колесиком мыши
+canvas.on('mouse:wheel', function(opt){
+  if(!mainPhoto) return;
+  const delta = opt.e.deltaY;
+  let scale = mainPhoto.scaleX - delta/500;
+  scale = Math.max(0.1, Math.min(5, scale));
+  mainPhoto.scale(scale);
+  canvas.renderAll();
+  opt.e.preventDefault();
+  opt.e.stopPropagation();
+});
 
-// initial sample: pre-add a faint decorative frame (optional)
-(function initSample(){
-  // nothing by default. Could add sample decorations if desired.
-})();
+// Перетаскивание и масштабирование объектов
+canvas.on('object:moving', function(e){ e.target.setCoords(); });
+canvas.on('object:scaling', function(e){ e.target.setCoords(); });
 
+// Падающий снег
+for(let i=0;i<50;i++){
+  const snow = document.createElement('div');
+  snow.className='snowflake';
+  snow.style.left=Math.random()*window.innerWidth+'px';
+  snow.style.animationDuration=(5+Math.random()*5)+'s';
+  snow.style.fontSize=(10+Math.random()*10)+'px';
+  snow.innerHTML='❄';
+  document.body.appendChild(snow);
+}
 </script>
 </body>
 </html>

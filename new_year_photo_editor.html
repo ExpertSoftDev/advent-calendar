@@ -3,25 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <title>Новогодний аватар</title>
-
 <style>
-    body {
+    /* Фон на всю страницу */
+    html, body {
         margin: 0;
-        background: #0d1323;
+        padding: 0;
+        height: 100%;
+        font-family: Arial, sans-serif;
+        background: url("images/fon-saita.png") center/cover no-repeat fixed;
+        background-color: #0d1323;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        font-family: Arial, sans-serif;
     }
 
+    /* Редактор */
     .editor {
         background: rgba(255,255,255,0.08);
         padding: 20px;
         border-radius: 20px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        box-shadow: 0 0 25px rgba(0,0,0,0.7);
         display: flex;
         gap: 20px;
+        backdrop-filter: blur(5px);
     }
 
     .tools {
@@ -29,23 +33,28 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        color: #fff;
     }
 
-    .tools button,
-    .tools input {
+    .tools button, .tools input {
         padding: 8px;
         border-radius: 10px;
         border: none;
         background: rgba(255,255,255,0.15);
         color: #fff;
         cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .tools button:hover, .tools input:hover {
+        background: rgba(255,255,255,0.3);
     }
 
     .avatar-area {
         width: 450px;
         height: 450px;
         background: rgba(255,255,255,0.05);
-        border-radius: 10px;
+        border-radius: 15px;
         position: relative;
         overflow: hidden;
     }
@@ -65,6 +74,7 @@
 
     .decoration-layer img {
         position: absolute;
+        pointer-events: none;
     }
 </style>
 </head>
@@ -77,18 +87,21 @@
 
         <h3>Рамки</h3>
         <button onclick="setFrame('images/frame1.png')">Снежинки</button>
-        <button onclick="setFrame('images/frame2.png')">Узор</button>
+        <button onclick="setFrame('images/frame2.png')">Морозный узор</button>
         <button onclick="setFrame(null)">Удалить рамку</button>
 
         <h3>Шапки</h3>
-        <button onclick="setHat('images/hat1.png')">Шапка Санты</button>
+        <button onclick="setHat('images/hat1.png')">Санта</button>
         <button onclick="setHat('images/hat2.png')">Эльф</button>
+        <button onclick="setHat('images/hat3.png')">Снеговик</button>
         <button onclick="setHat(null)">Удалить шапку</button>
 
         <h3>Фильтры</h3>
         <button onclick="setFilter('none')">Нет</button>
-        <button onclick="setFilter('grayscale(50%)')">Ч/Б</button>
-        <button onclick="setFilter('sepia(50%)')">Сепия</button>
+        <button onclick="setFilter('brightness(1.2) sepia(0.1) hue-rotate(10deg)')">Тёплый золотой</button>
+        <button onclick="setFilter('brightness(1.1) saturate(0.7) hue-rotate(180deg) contrast(1.2)')">Холодный декабрь</button>
+        <button onclick="setFilter('brightness(1.1) saturate(1.2) sepia(0.2) hue-rotate(-20deg)')">Рождественский</button>
+        <button onclick="setFilter('sepia(0.1) contrast(1.1)')">Мягкий винтаж</button>
 
         <h3>Экспорт</h3>
         <button onclick="downloadAvatar()">Скачать PNG</button>
@@ -113,10 +126,12 @@ document.getElementById("upload").addEventListener("change", e => {
 });
 
 function setFilter(f) { avatar.style.filter = f; }
+
 function setFrame(src) {
     frameSrc = src;
     renderDecorations();
 }
+
 function setHat(src) {
     hatSrc = src;
     renderDecorations();
@@ -125,7 +140,7 @@ function setHat(src) {
 function renderDecorations() {
     decorations.innerHTML = "";
 
-    if (frameSrc) {
+    if(frameSrc) {
         const frame = document.createElement("img");
         frame.src = frameSrc;
         frame.style.top = "0";
@@ -136,7 +151,7 @@ function renderDecorations() {
         decorations.appendChild(frame);
     }
 
-    if (hatSrc) {
+    if(hatSrc) {
         const hat = document.createElement("img");
         hat.src = hatSrc;
         hat.style.width = "160px";
@@ -164,19 +179,20 @@ async function downloadAvatar() {
     canvas.height = size;
     const ctx = canvas.getContext("2d");
 
-    // фото
+    // Фото
     const base = await loadImageAsync(avatar.src);
     ctx.filter = getComputedStyle(avatar).filter;
     ctx.drawImage(base, 0, 0, size, size);
 
-    // рамка
-    if (frameSrc) {
-        const fr = await loadImageAsync(frameSrc);
-        ctx.drawImage(fr, 0, 0, size, size);
+    // Рамка
+    if(frameSrc) {
+        const frame = await loadImageAsync(frameSrc);
+        ctx.filter = 'none';
+        ctx.drawImage(frame, 0, 0, size, size);
     }
 
-    // шапка
-    if (hatSrc) {
+    // Шапка
+    if(hatSrc) {
         const hat = await loadImageAsync(hatSrc);
         const hatW = size * 0.35;
         const hatH = hat.height / hat.width * hatW;

@@ -2,240 +2,191 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Новогодний аватар — Адвент Expert Soft</title>
+<title>Новогодний аватар</title>
+
 <style>
-    /* Фон всей страницы */
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to bottom, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.9)),
-                    url("images/fon-saita.png") center/cover no-repeat fixed;
-        color: #fff;
-        overflow: hidden;
-        height: 100vh;
-    }
-
-    /* Полупрозрачный блок редактора */
-    .editor-container {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(6px);
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.7);
-        display: flex;
-        flex-direction: row;
-        gap: 20px;
-        max-width: 1000px;
-        width: 90%;
-        height: 600px;
-    }
-
-    /* Панель инструментов слева */
-    .tools {
-        width: 220px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        overflow-y: auto;
-    }
-
-    .tools h3 {
-        margin: 0 0 10px 0;
-        font-size: 18px;
-        text-align: center;
-        text-shadow: 0 0 6px #000;
-    }
-
-    .tools button, .tools input[type="file"] {
-        width: 100%;
-        padding: 8px;
-        border-radius: 10px;
-        border: none;
-        background: rgba(255,255,255,0.2);
-        color: #fff;
-        cursor: pointer;
-        font-weight: bold;
-        text-align: center;
-        transition: 0.3s;
-    }
-
-    .tools button:hover {
-        background: rgba(255,255,255,0.4);
-    }
-
-    /* Зона аватарки */
-    .avatar-area {
-        flex: 1;
-        position: relative;
-        background: rgba(255,255,255,0.05);
-        border-radius: 15px;
-        overflow: hidden;
+        background: #0d1323;
         display: flex;
         justify-content: center;
         align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
     }
 
-    .avatar-area img {
-        max-width: 100%;
-        max-height: 100%;
-        border-radius: 15px;
-        display: block;
+    .editor {
+        background: rgba(255,255,255,0.08);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        display: flex;
+        gap: 20px;
+    }
+
+    .tools {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tools button,
+    .tools input {
+        padding: 8px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(255,255,255,0.15);
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .avatar-area {
+        width: 450px;
+        height: 450px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
         position: relative;
-        z-index: 1;
+        overflow: hidden;
     }
 
-    /* Рамки и украшения */
-    .decoration {
-        position: absolute;
-        top: 0;
-        left: 0;
+    #avatar {
         width: 100%;
         height: 100%;
-        pointer-events: none;
-        z-index: 2;
+        object-fit: cover;
     }
 
-    .decoration img {
+    .decoration-layer {
         position: absolute;
-        width: auto;
-        height: auto;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
     }
 
-    /* Полосы скролла для инструментов */
-    .tools::-webkit-scrollbar {
-        width: 8px;
-    }
-    .tools::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.3);
-        border-radius: 4px;
+    .decoration-layer img {
+        position: absolute;
     }
 </style>
 </head>
 <body>
 
-<div class="editor-container">
-    <!-- Панель инструментов -->
+<div class="editor">
     <div class="tools">
-        <h3>Загрузить фото</h3>
+        <h3>Фото</h3>
         <input type="file" id="upload" accept="image/*">
 
         <h3>Рамки</h3>
-        <button onclick="addFrame('images/frame_snowflakes.png')">Снежинки</button>
-        <button onclick="addFrame('images/frame_glass.png')">Узор стекла</button>
-        <button onclick="addFrame('images/frame_pattern.png')">Новогодний узор</button>
-        <button onclick="removeFrame()">Удалить рамку</button>
+        <button onclick="setFrame('images/frame1.png')">Снежинки</button>
+        <button onclick="setFrame('images/frame2.png')">Узор</button>
+        <button onclick="setFrame(null)">Удалить рамку</button>
 
         <h3>Шапки</h3>
-        <button onclick="addHat('images/hat1.png')">Шапка Санты</button>
-        <button onclick="addHat('images/hat2.png')">Шапка эльфа</button>
-        <button onclick="removeHat()">Удалить шапку</button>
+        <button onclick="setHat('images/hat1.png')">Шапка Санты</button>
+        <button onclick="setHat('images/hat2.png')">Эльф</button>
+        <button onclick="setHat(null)">Удалить шапку</button>
 
         <h3>Фильтры</h3>
-        <button onclick="setFilter('none')">Без фильтра</button>
-        <button onclick="setFilter('grayscale(50%)')">Черно-белый</button>
+        <button onclick="setFilter('none')">Нет</button>
+        <button onclick="setFilter('grayscale(50%)')">Ч/Б</button>
         <button onclick="setFilter('sepia(50%)')">Сепия</button>
-        <button onclick="setFilter('contrast(150%)')">Контраст</button>
 
-        <h3>Скачать</h3>
-        <button onclick="downloadAvatar()">Скачать</button>
+        <h3>Экспорт</h3>
+        <button onclick="downloadAvatar()">Скачать PNG</button>
     </div>
 
-    <!-- Зона аватарки -->
-    <div class="avatar-area">
-        <img id="avatar" src="" alt="Ваш аватар">
-        <div class="decoration" id="decoration"></div>
+    <div class="avatar-area" id="avatarArea">
+        <img id="avatar">
+        <div class="decoration-layer" id="decorations"></div>
     </div>
 </div>
 
 <script>
-const avatar = document.getElementById('avatar');
-const decoration = document.getElementById('decoration');
+const avatar = document.getElementById("avatar");
+const decorations = document.getElementById("decorations");
 
-document.getElementById('upload').addEventListener('change', function(e){
+let frameSrc = null;
+let hatSrc = null;
+
+document.getElementById("upload").addEventListener("change", e => {
     const file = e.target.files[0];
-    if(file){
-        avatar.src = URL.createObjectURL(file);
-    }
+    if (file) avatar.src = URL.createObjectURL(file);
 });
 
-// Добавление рамки
-function addFrame(src){
-    removeFrame();
-    const img = document.createElement('img');
-    img.src = src;
-    img.style.top = '0';
-    img.style.left = '0';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    img.classList.add('frame');
-    decoration.appendChild(img);
+function setFilter(f) { avatar.style.filter = f; }
+function setFrame(src) {
+    frameSrc = src;
+    renderDecorations();
+}
+function setHat(src) {
+    hatSrc = src;
+    renderDecorations();
 }
 
-// Удаление рамки
-function removeFrame(){
-    const existing = decoration.querySelector('.frame');
-    if(existing) existing.remove();
+function renderDecorations() {
+    decorations.innerHTML = "";
+
+    if (frameSrc) {
+        const frame = document.createElement("img");
+        frame.src = frameSrc;
+        frame.style.top = "0";
+        frame.style.left = "0";
+        frame.style.width = "100%";
+        frame.style.height = "100%";
+        frame.style.objectFit = "cover";
+        decorations.appendChild(frame);
+    }
+
+    if (hatSrc) {
+        const hat = document.createElement("img");
+        hat.src = hatSrc;
+        hat.style.width = "160px";
+        hat.style.top = "-10px";
+        hat.style.left = "50%";
+        hat.style.transform = "translateX(-50%)";
+        decorations.appendChild(hat);
+    }
 }
 
-// Добавление шапки
-function addHat(src){
-    removeHat();
-    const img = document.createElement('img');
-    img.src = src;
-    img.style.top = '-20px';
-    img.style.left = '50%';
-    img.style.transform = 'translateX(-50%)';
-    img.style.width = '120px';
-    img.classList.add('hat');
-    decoration.appendChild(img);
-}
-
-// Удаление шапки
-function removeHat(){
-    const existing = decoration.querySelector('.hat');
-    if(existing) existing.remove();
-}
-
-// Фильтры
-function setFilter(value){
-    avatar.style.filter = value;
-}
-
-// Скачать аватар
-function downloadAvatar(){
-    const canvas = document.createElement('canvas');
-    canvas.width = avatar.naturalWidth || 400;
-    canvas.height = avatar.naturalHeight || 400;
-    const ctx = canvas.getContext('2d');
-
-    // Фон прозрачный
-    ctx.fillStyle = 'rgba(0,0,0,0)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    // Фото
-    ctx.drawImage(avatar, 0, 0, canvas.width, canvas.height);
-
-    // Рамки и шапки
-    const decorations = decoration.querySelectorAll('img');
-    decorations.forEach(img => {
-        const deco = new Image();
-        deco.src = img.src;
-        deco.onload = function(){
-            ctx.drawImage(deco, 0, 0, canvas.width, canvas.height);
-        }
+async function loadImageAsync(src) {
+    return new Promise(res => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => res(img);
     });
+}
 
-    setTimeout(() => {
-        const link = document.createElement('a');
-        link.download = 'avatar.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    }, 200); // Даем время загрузить все декорации
+async function downloadAvatar() {
+    if (!avatar.src) return alert("Сначала загрузите фото!");
+
+    const size = 1000;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+
+    // фото
+    const base = await loadImageAsync(avatar.src);
+    ctx.filter = getComputedStyle(avatar).filter;
+    ctx.drawImage(base, 0, 0, size, size);
+
+    // рамка
+    if (frameSrc) {
+        const fr = await loadImageAsync(frameSrc);
+        ctx.drawImage(fr, 0, 0, size, size);
+    }
+
+    // шапка
+    if (hatSrc) {
+        const hat = await loadImageAsync(hatSrc);
+        const hatW = size * 0.35;
+        const hatH = hat.height / hat.width * hatW;
+        ctx.drawImage(hat, size/2 - hatW/2, size*0.02, hatW, hatH);
+    }
+
+    const link = document.createElement("a");
+    link.download = "avatar.png";
+    link.href = canvas.toDataURL();
+    link.click();
 }
 </script>
 

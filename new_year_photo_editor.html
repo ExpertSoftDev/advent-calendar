@@ -1,232 +1,151 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Адвент Expert Soft</title>
-<style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        background: url("images/fon-saita2.webp") center/cover no-repeat fixed;
-        background-color: #0d1323;
-        font-family: Arial, sans-serif;
-        color: #fff;
-        min-height: 100vh;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Новогодний фото-редактор</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: url('https://images.unsplash.com/photo-1604079626808-9d0e35b0fdd3?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
     }
-
-    .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 40px 20px;
+    .editor-container {
+      background: rgba(0,0,0,0.5);
+      padding: 20px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-
-    h1 {
-        text-align: center;
-        font-size: 42px;
-        margin-bottom: 10px;
-        text-shadow: 0 0 10px #000;
+    canvas {
+      border: 2px solid #fff;
+      margin-bottom: 20px;
+      border-radius: 10px;
     }
-
-    h2 {
-        text-align: center;
-        font-size: 24px;
-        margin-bottom: 30px;
-        text-shadow: 0 0 10px #000;
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
     }
-
-    .editor {
-        background: rgba(255,255,255,0.08);
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
+    button, input[type="file"], select {
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
     }
-
-    .tools {
-        width: 220px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    button:hover, select:hover {
+      background-color: #ffd700aa;
     }
-
-    .tools h3 {
-        margin: 10px 0 5px;
-    }
-
-    .tools button,
-    .tools input {
-        padding: 8px;
-        border-radius: 10px;
-        border: none;
-        background: rgba(255,255,255,0.15);
-        color: #fff;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .tools button:hover,
-    .tools input:hover {
-        background: rgba(255,255,255,0.3);
-    }
-
-    .avatar-area {
-        width: 450px;
-        max-width: 90vw;
-        height: 450px;
-        max-height: 90vw;
-        background: rgba(255,255,255,0.05);
-        border-radius: 15px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    #avatar {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .decoration-layer {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-    }
-
-    .decoration-layer img {
-        position: absolute;
-    }
-</style>
+  </style>
 </head>
 <body>
-<div class="container">
-    <h1>Новогодний аватар</h1>
-    <h2>Загрузите фото и украсьте его рамками, шапками и фильтрами!</h2>
-
-    <div class="editor">
-        <div class="tools">
-            <h3>Фото</h3>
-            <input type="file" id="upload" accept="image/*">
-
-            <h3>Рамки</h3>
-            <button onclick="setFrame('images/frame1.png')">Снежинки</button>
-            <button onclick="setFrame('images/frame2.png')">Узор</button>
-            <button onclick="setFrame(null)">Удалить рамку</button>
-
-            <h3>Шапки</h3>
-            <button onclick="setHat('images/hat1.png')">Шапка Санты</button>
-            <button onclick="setHat('images/hat2.png')">Эльф</button>
-            <button onclick="setHat(null)">Удалить шапку</button>
-
-            <h3>Фильтры</h3>
-            <button onclick="setFilter('none')">Нет</button>
-            <button onclick="setFilter('brightness(1.2) sepia(0.1)')">Тёплый золотой свет</button>
-            <button onclick="setFilter('brightness(0.9) saturate(1.2) hue-rotate(180deg)')">Холодный декабрь</button>
-            <button onclick="setFilter('brightness(1.1) sepia(0.3) hue-rotate(-10deg)')">Рождественский</button>
-            <button onclick="setFilter('contrast(1.1) sepia(0.1) grayscale(0.05)')">Мягкий винтаж</button>
-
-            <h3>Экспорт</h3>
-            <button onclick="downloadAvatar()">Скачать PNG</button>
-        </div>
-
-        <div class="avatar-area" id="avatarArea">
-            <img id="avatar">
-            <div class="decoration-layer" id="decorations"></div>
-        </div>
+  <h1>Новогодний фото-редактор</h1>
+  <div class="editor-container">
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <div class="controls">
+      <input type="file" id="upload" accept="image/*">
+      <button onclick="addFrame('https://i.ibb.co/0mXvX7r/snowframe.png')">Добавить рамку</button>
+      <button onclick="addDecoration('https://i.ibb.co/8bXv5fP/santa-hat.png')">Шапка Деда Мороза</button>
+      <button onclick="addDecoration('https://i.ibb.co/1J2c5n5/elf-hat.png')">Шапка эльфа</button>
+      <button onclick="addDecoration('https://i.ibb.co/7kPrKqG/garland.png')">Гирлянда</button>
+      <button onclick="addDecoration('https://i.ibb.co/zsDk7gk/ball.png')">Новогодний шар</button>
+      <select id="filterSelect" onchange="applyFilter()">
+        <option value="">Фильтры</option>
+        <option value="warm">Теплый</option>
+        <option value="vintage">Винтаж</option>
+        <option value="grayscale">Ч/Б</option>
+      </select>
+      <button onclick="downloadImage()">Скачать фото</button>
     </div>
-</div>
+  </div>
 
-<script>
-const avatar = document.getElementById("avatar");
-const decorations = document.getElementById("decorations");
+  <script>
+    const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
 
-let frameSrc = null;
-let hatSrc = null;
-
-document.getElementById("upload").addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (file) avatar.src = URL.createObjectURL(file);
-});
-
-function setFilter(f) { avatar.style.filter = f; }
-
-function setFrame(src) {
-    frameSrc = src;
-    renderDecorations();
-}
-
-function setHat(src) {
-    hatSrc = src;
-    renderDecorations();
-}
-
-function renderDecorations() {
-    decorations.innerHTML = "";
-    if (frameSrc) {
-        const frame = document.createElement("img");
-        frame.src = frameSrc;
-        frame.style.top = "0";
-        frame.style.left = "0";
-        frame.style.width = "100%";
-        frame.style.height = "100%";
-        frame.style.objectFit = "cover";
-        decorations.appendChild(frame);
-    }
-    if (hatSrc) {
-        const hat = document.createElement("img");
-        hat.src = hatSrc;
-        hat.style.width = "160px";
-        hat.style.top = "-10px";
-        hat.style.left = "50%";
-        hat.style.transform = "translateX(-50%)";
-        decorations.appendChild(hat);
-    }
-}
-
-async function loadImageAsync(src) {
-    return new Promise(res => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => res(img);
+    // Загрузка фото
+    document.getElementById('upload').addEventListener('change', function(e){
+      const reader = new FileReader();
+      reader.onload = function(event){
+        const imgObj = new Image();
+        imgObj.src = event.target.result;
+        imgObj.onload = function() {
+          const img = new fabric.Image(imgObj);
+          img.set({ left: 0, top: 0, selectable: true });
+          img.scaleToWidth(canvas.width);
+          img.scaleToHeight(canvas.height);
+          canvas.clear();
+          canvas.add(img);
+          canvas.sendToBack(img);
+        }
+      }
+      reader.readAsDataURL(e.target.files[0]);
     });
-}
 
-async function downloadAvatar() {
-    if (!avatar.src) return alert("Сначала загрузите фото!");
-
-    const size = 1000;
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-
-    // фото
-    const base = await loadImageAsync(avatar.src);
-    ctx.filter = getComputedStyle(avatar).filter;
-    ctx.drawImage(base, 0, 0, size, size);
-
-    // рамка
-    if (frameSrc) {
-        const fr = await loadImageAsync(frameSrc);
-        ctx.drawImage(fr, 0, 0, size, size);
+    // Добавление рамки
+    function addFrame(url){
+      fabric.Image.fromURL(url, function(img){
+        img.set({ left: 0, top: 0, selectable: true });
+        img.scaleToWidth(canvas.width);
+        img.scaleToHeight(canvas.height);
+        canvas.add(img);
+      });
     }
 
-    // шапка
-    if (hatSrc) {
-        const hat = await loadImageAsync(hatSrc);
-        const hatW = size * 0.35;
-        const hatH = hat.height / hat.width * hatW;
-        ctx.drawImage(hat, size/2 - hatW/2, size*0.02, hatW, hatH);
+    // Добавление украшений
+    function addDecoration(url){
+      fabric.Image.fromURL(url, function(img){
+        img.set({ left: canvas.width/2 - 50, top: canvas.height/2 - 50, selectable: true });
+        img.scale(0.2);
+        canvas.add(img);
+        canvas.setActiveObject(img);
+      });
     }
 
-    const link = document.createElement("a");
-    link.download = "avatar.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-}
-</script>
+    // Применение фильтров
+    function applyFilter(){
+      const filter = document.getElementById('filterSelect').value;
+      const objects = canvas.getObjects();
+      objects.forEach(obj => {
+        if(obj.type === 'image' && obj !== objects[objects.length-1]){ // фильтруем только основное фото
+          obj.filters = [];
+          if(filter === 'warm'){
+            obj.filters.push(new fabric.Image.filters.Tint({ color: '#ffdfba', opacity: 0.3 }));
+          } else if(filter === 'vintage'){
+            obj.filters.push(new fabric.Image.filters.Sepia());
+          } else if(filter === 'grayscale'){
+            obj.filters.push(new fabric.Image.filters.Grayscale());
+          }
+          obj.applyFilters();
+        }
+      });
+      canvas.renderAll();
+    }
+
+    // Скачивание
+    function downloadImage(){
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL({ format: 'png' });
+      link.download = 'newyear_photo.png';
+      link.click();
+    }
+
+    // Позволяем перемещать и масштабировать объекты
+    canvas.on('object:moving', function(e){
+      e.target.setCoords();
+    });
+    canvas.on('object:scaling', function(e){
+      e.target.setCoords();
+    });
+  </script>
 </body>
 </html>

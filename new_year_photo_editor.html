@@ -14,6 +14,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    position: relative;
   }
 
   .editor-container {
@@ -22,6 +23,7 @@
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    z-index: 1; /* чтобы быть выше гирлянд */
   }
 
   canvas {
@@ -51,25 +53,25 @@
     background: rgba(255, 215, 0, 0.7);
   }
 
-  /* Гирлянды */
+  /* Гирлянды фиксированы по углам страницы */
   .garland-left, .garland-right {
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 200px;
     pointer-events: none;
+    z-index: 0; /* ниже редактора */
   }
   .garland-left { left: 0; }
   .garland-right { right: 0; }
 </style>
 </head>
 <body>
+  <!-- гирлянды на всей странице -->
+  <img src="images/garland-left.png" class="garland-left">
+  <img src="images/garland-right.png" class="garland-right">
+
   <div class="editor-container">
     <canvas id="canvas" width="600" height="600"></canvas>
-
-    <!-- гирлянды -->
-    <img src="images/garland-left.png" class="garland-left">
-    <img src="images/garland-right.png" class="garland-right">
-
     <div class="controls">
       <input type="file" id="upload" accept="image/*">
     </div>
@@ -116,7 +118,7 @@
     opt.e.stopPropagation();
   });
 
-  // Обеспечиваем возможность перетаскивания
+  // Перетаскивание фото
   canvas.on('object:moving', function(e){ e.target.setCoords(); });
 </script>
 </body>

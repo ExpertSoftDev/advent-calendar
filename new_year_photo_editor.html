@@ -3,46 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎄 Новогодний фото-редактор 🎄</title>
+<title>Новогодний редактор</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 <style>
   body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    overflow: hidden;
-    background: linear-gradient(to bottom, #0a1f2f, #1a3b5f);
+    font-family: Arial, sans-serif;
+    background: url('images/background.jpg') center/cover no-repeat;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 20px;
-    color: #fff;
+    height: 100vh;
   }
-  h1 {
-    text-shadow: 2px 2px 6px #000;
-    margin-bottom: 10px;
-  }
+
   .editor-container {
     position: relative;
     background: rgba(0,0,0,0.6);
     padding: 20px;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  canvas {
-    border: 3px solid #fff;
     border-radius: 15px;
-    cursor: grab;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   }
+
+  canvas {
+    border-radius: 12px;
+    border: 2px solid #fff;
+    background-color: transparent;
+  }
+
   .controls {
+    margin-top: 12px;
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
-    margin-top: 10px;
   }
-  button, input[type="file"], select {
+
+  button, input[type="file"] {
     padding: 10px 15px;
     border-radius: 10px;
     border: none;
@@ -50,152 +45,79 @@
     font-size: 14px;
     background: rgba(255,255,255,0.2);
     color: #fff;
-    transition: 0.3s;
   }
-  button:hover, select:hover {
-    background-color: rgba(255, 215, 0, 0.7);
+
+  button:hover, input[type="file"]:hover {
+    background: rgba(255, 215, 0, 0.7);
   }
-  /* Снежинки */
-  .snowflake {
+
+  /* Гирлянды */
+  .garland-left, .garland-right {
     position: absolute;
-    top: -10px;
-    color: #fff;
-    user-select: none;
+    top: 0;
+    width: 200px;
     pointer-events: none;
-    font-size: 10px;
-    animation-name: fall;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
   }
-  @keyframes fall {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(700px); }
-  }
+  .garland-left { left: 0; }
+  .garland-right { right: 0; }
 </style>
 </head>
 <body>
-<h1>🎄 Новогодний фото-редактор 🎄</h1>
-<div class="editor-container">
-  <canvas id="canvas" width="600" height="600"></canvas>
-  <div class="controls">
-    <input type="file" id="upload" accept="image/*">
-    <button onclick="addFrame('https://i.ibb.co/0mXvX7r/snowframe.png')">Добавить рамку ❄️</button>
-    <button onclick="addDecoration('https://i.ibb.co/8bXv5fP/santa-hat.png')">Шапка Деда Мороза 🎅</button>
-    <button onclick="addDecoration('https://i.ibb.co/1J2c5n5/elf-hat.png')">Шапка эльфа 🧝</button>
-    <button onclick="addDecoration('https://i.ibb.co/7kPrKqG/garland.png')">Гирлянда 🎀</button>
-    <button onclick="addDecoration('https://i.ibb.co/zsDk7gk/ball.png')">Новогодний шар 🎈</button>
-    <select id="filterSelect" onchange="applyFilter()">
-      <option value="">Без фильтра</option>
-      <option value="vintage">Винтаж 📷</option>
-      <option value="grayscale">Ч/Б ⚫⚪</option>
-    </select>
-    <button onclick="deleteObject()">Удалить выбранное 🗑️</button>
-    <button onclick="downloadImage()">Скачать фото 💾</button>
+  <div class="editor-container">
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <!-- гирлянды -->
+    <img src="images/garland-left.png" class="garland-left">
+    <img src="images/garland-right.png" class="garland-right">
+
+    <div class="controls">
+      <input type="file" id="upload" accept="image/*">
+    </div>
   </div>
-</div>
 
 <script>
-const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
-let mainPhoto = null;
+  const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
+  let mainPhoto = null;
 
-// Функция загрузки фото
-document.getElementById('upload').addEventListener('change', function(e){
-  const reader = new FileReader();
-  reader.onload = function(event){
-    fabric.Image.fromURL(event.target.result, function(img){
-      img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
-      img.scaleToWidth(canvas.width);
-      mainPhoto = img;
-      canvas.clear();
-      canvas.add(img);
-      canvas.sendToBack(img);
-      canvas.renderAll();
-    }, { crossOrigin: 'anonymous' });
-  }
-  reader.readAsDataURL(e.target.files[0]);
-});
+  // Загрузка фото
+  document.getElementById('upload').addEventListener('change', function(e){
+    const reader = new FileReader();
+    reader.onload = function(event){
+      fabric.Image.fromURL(event.target.result, function(img){
+        img.set({ 
+          left: canvas.width/2, 
+          top: canvas.height/2, 
+          originX:'center', 
+          originY:'center',
+          selectable:true
+        });
+        // Масштабируем под размер канваса
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        img.scale(scale);
+        mainPhoto = img;
+        canvas.clear();
+        canvas.add(img);
+        canvas.sendToBack(img);
+        canvas.renderAll();
+      }, { crossOrigin: 'anonymous' });
+    }
+    reader.readAsDataURL(e.target.files[0]);
+  });
 
-// Добавление рамки
-function addFrame(url){
-  fabric.Image.fromURL(url, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
-    img.scaleToWidth(canvas.width);
-    canvas.add(img);
-    canvas.setActiveObject(img);
+  // Масштабирование колесом мыши
+  canvas.on('mouse:wheel', function(opt){
+    if(!mainPhoto) return;
+    const delta = opt.e.deltaY;
+    let scale = mainPhoto.scaleX - delta / 500;
+    scale = Math.max(0.1, Math.min(5, scale));
+    mainPhoto.scale(scale);
     canvas.renderAll();
-  }, { crossOrigin: 'anonymous' });
-}
+    opt.e.preventDefault();
+    opt.e.stopPropagation();
+  });
 
-// Добавление украшений
-function addDecoration(url){
-  fabric.Image.fromURL(url, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
-    img.scale(0.2);
-    canvas.add(img);
-    canvas.setActiveObject(img);
-    canvas.renderAll();
-  }, { crossOrigin: 'anonymous' });
-}
-
-// Применение фильтров
-function applyFilter(){
-  if(!mainPhoto) return;
-  const filter = document.getElementById('filterSelect').value;
-  mainPhoto.filters = [];
-  if(filter === 'vintage'){
-    mainPhoto.filters.push(new fabric.Image.filters.Sepia());
-  } else if(filter === 'grayscale'){
-    mainPhoto.filters.push(new fabric.Image.filters.Grayscale());
-  }
-  mainPhoto.applyFilters();
-  canvas.renderAll();
-}
-
-// Удаление выбранного объекта
-function deleteObject(){
-  const active = canvas.getActiveObject();
-  if(active){
-    if(active === mainPhoto) mainPhoto = null;
-    canvas.remove(active);
-    canvas.renderAll();
-  }
-}
-
-// Скачивание итогового изображения
-function downloadImage(){
-  const dataURL = canvas.toDataURL({ format:'png', multiplier:2 });
-  const link = document.createElement('a');
-  link.href = dataURL;
-  link.download = 'newyear_photo.png';
-  link.click();
-}
-
-// Масштабирование основного фото колесиком мыши
-canvas.on('mouse:wheel', function(opt){
-  if(!mainPhoto) return;
-  const delta = opt.e.deltaY;
-  let scale = mainPhoto.scaleX - delta/500;
-  scale = Math.max(0.1, Math.min(5, scale));
-  mainPhoto.scale(scale);
-  canvas.renderAll();
-  opt.e.preventDefault();
-  opt.e.stopPropagation();
-});
-
-// Перетаскивание и масштабирование объектов
-canvas.on('object:moving', function(e){ e.target.setCoords(); });
-canvas.on('object:scaling', function(e){ e.target.setCoords(); });
-
-// Падающий снег
-for(let i=0;i<50;i++){
-  const snow = document.createElement('div');
-  snow.className='snowflake';
-  snow.style.left=Math.random()*window.innerWidth+'px';
-  snow.style.animationDuration=(5+Math.random()*5)+'s';
-  snow.style.fontSize=(10+Math.random()*10)+'px';
-  snow.innerHTML='❄';
-  document.body.appendChild(snow);
-}
+  // Обеспечиваем возможность перетаскивания
+  canvas.on('object:moving', function(e){ e.target.setCoords(); });
 </script>
 </body>
 </html>

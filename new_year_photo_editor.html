@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Новогодний фото-редактор</title>
+<title>🎄 Новогодний фото-редактор 🎄</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 <style>
   body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background: url('https://images.unsplash.com/photo-1604079626808-9d0e35b0fdd3?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
-    background-size: cover;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #0a1f2f, #1a3b5f);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,8 +19,10 @@
   }
   h1 {
     text-shadow: 2px 2px 6px #000;
+    margin-bottom: 10px;
   }
   .editor-container {
+    position: relative;
     background: rgba(0,0,0,0.6);
     padding: 20px;
     border-radius: 20px;
@@ -31,7 +33,6 @@
   canvas {
     border: 3px solid #fff;
     border-radius: 15px;
-    margin-bottom: 20px;
     cursor: grab;
   }
   .controls {
@@ -39,6 +40,7 @@
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
+    margin-top: 10px;
   }
   button, input[type="file"], select {
     padding: 10px 15px;
@@ -52,6 +54,22 @@
   }
   button:hover, select:hover {
     background-color: rgba(255, 215, 0, 0.7);
+  }
+  /* Снежинки */
+  .snowflake {
+    position: absolute;
+    top: -10px;
+    color: #fff;
+    user-select: none;
+    pointer-events: none;
+    font-size: 10px;
+    animation-name: fall;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(700px); }
   }
 </style>
 </head>
@@ -67,8 +85,7 @@
     <button onclick="addDecoration('https://i.ibb.co/7kPrKqG/garland.png')">Гирлянда 🎀</button>
     <button onclick="addDecoration('https://i.ibb.co/zsDk7gk/ball.png')">Новогодний шар 🎈</button>
     <select id="filterSelect" onchange="applyFilter()">
-      <option value="">Фильтры</option>
-      <option value="warm">Теплый 🔆</option>
+      <option value="">Без фильтра</option>
       <option value="vintage">Винтаж 📷</option>
       <option value="grayscale">Ч/Б ⚫⚪</option>
     </select>
@@ -120,14 +137,12 @@ function addDecoration(url){
   }, { crossOrigin: 'anonymous' });
 }
 
-// Применение фильтров к основному фото
+// Применение фильтров
 function applyFilter(){
   if(!mainPhoto) return;
   const filter = document.getElementById('filterSelect').value;
   mainPhoto.filters = [];
-  if(filter === 'warm'){
-    mainPhoto.filters.push(new fabric.Image.filters.Tint({ color: '#ffdfba', opacity:0.3 }));
-  } else if(filter === 'vintage'){
+  if(filter === 'vintage'){
     mainPhoto.filters.push(new fabric.Image.filters.Sepia());
   } else if(filter === 'grayscale'){
     mainPhoto.filters.push(new fabric.Image.filters.Grayscale());
@@ -148,14 +163,11 @@ function deleteObject(){
 
 // Скачивание итогового изображения
 function downloadImage(){
-  // Делаем временный рендер
   const dataURL = canvas.toDataURL({ format:'png', multiplier:2 });
   const link = document.createElement('a');
   link.href = dataURL;
   link.download = 'newyear_photo.png';
-  document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
 }
 
 // Масштабирование основного фото колесиком мыши
@@ -173,6 +185,17 @@ canvas.on('mouse:wheel', function(opt){
 // Перетаскивание и масштабирование объектов
 canvas.on('object:moving', function(e){ e.target.setCoords(); });
 canvas.on('object:scaling', function(e){ e.target.setCoords(); });
+
+// Падающий снег
+for(let i=0;i<50;i++){
+  const snow = document.createElement('div');
+  snow.className='snowflake';
+  snow.style.left=Math.random()*window.innerWidth+'px';
+  snow.style.animationDuration=(5+Math.random()*5)+'s';
+  snow.style.fontSize=(10+Math.random()*10)+'px';
+  snow.innerHTML='❄';
+  document.body.appendChild(snow);
+}
 </script>
 </body>
 </html>

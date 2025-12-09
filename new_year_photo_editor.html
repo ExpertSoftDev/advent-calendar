@@ -1,201 +1,219 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎄 Новогодний фото-редактор 🎄</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Новогодний Фото-Редактор</title>
 <style>
   body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    overflow: hidden;
-    background: linear-gradient(to bottom, #0a1f2f, #1a3b5f);
+    font-family: Arial, sans-serif;
+    background: url('images/background.jpg') center/cover no-repeat fixed;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
     color: #fff;
   }
-  h1 {
-    text-shadow: 2px 2px 6px #000;
-    margin-bottom: 10px;
-  }
-  .editor-container {
-    position: relative;
-    background: rgba(0,0,0,0.6);
+
+  .panel {
+    margin-top: 20px;
     padding: 20px;
-    border-radius: 20px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 16px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    gap: 20px;
   }
+
   canvas {
-    border: 3px solid #fff;
-    border-radius: 15px;
-    cursor: grab;
-  }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 10px;
-  }
-  button, input[type="file"], select {
-    padding: 10px 15px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
+    border-radius: 16px;
     background: rgba(255,255,255,0.2);
-    color: #fff;
-    transition: 0.3s;
+    backdrop-filter: blur(10px);
   }
-  button:hover, select:hover {
-    background-color: rgba(255, 215, 0, 0.7);
+
+  .controls {
+    padding: 20px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
-  /* Снежинки */
-  .snowflake {
-    position: absolute;
-    top: -10px;
-    color: #fff;
-    user-select: none;
-    pointer-events: none;
-    font-size: 10px;
-    animation-name: fall;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-  }
-  @keyframes fall {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(700px); }
+
+  select, button, input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
   }
 </style>
 </head>
 <body>
-<h1>🎄 Новогодний фото-редактор 🎄</h1>
-<div class="editor-container">
-  <canvas id="canvas" width="600" height="600"></canvas>
+
+<h1>🎄 Новогодний Фото-Редактор 🎄</h1>
+
+<div class="panel">
+  <canvas id="editor" width="700" height="500"></canvas>
+
   <div class="controls">
-    <input type="file" id="upload" accept="image/*">
-    <button onclick="addFrame('https://i.ibb.co/0mXvX7r/snowframe.png')">Добавить рамку ❄️</button>
-    <button onclick="addDecoration('https://i.ibb.co/8bXv5fP/santa-hat.png')">Шапка Деда Мороза 🎅</button>
-    <button onclick="addDecoration('https://i.ibb.co/1J2c5n5/elf-hat.png')">Шапка эльфа 🧝</button>
-    <button onclick="addDecoration('https://i.ibb.co/7kPrKqG/garland.png')">Гирлянда 🎀</button>
-    <button onclick="addDecoration('https://i.ibb.co/zsDk7gk/ball.png')">Новогодний шар 🎈</button>
-    <select id="filterSelect" onchange="applyFilter()">
-      <option value="">Без фильтра</option>
-      <option value="vintage">Винтаж 📷</option>
-      <option value="grayscale">Ч/Б ⚫⚪</option>
+    <input type="file" id="upload" accept="image/*" />
+
+    <label>Рамка:</label>
+    <select id="frameSelect">
+      <option value="none">Нет</option>
+      <option value="frame-snow.png">Снежная</option>
+      <option value="frame-ice.png">Ледяная</option>
+      <option value="frame-garland.png">Гирлянда</option>
     </select>
-    <button onclick="deleteObject()">Удалить выбранное 🗑️</button>
-    <button onclick="downloadImage()">Скачать фото 💾</button>
+
+    <label>Украшение:</label>
+    <select id="decorSelect">
+      <option value="none">Выбрать украшение</option>
+      <option value="hat-santa.png">Шапка Санты</option>
+      <option value="hat-elf.png">Шапка Эльфа</option>
+      <option value="ball-red.png">Шар красный</option>
+      <option value="ball-blue.png">Шар синий</option>
+      <option value="snowflake.png">Снежинка</option>
+      <option value="garland.png">Гирлянда</option>
+    </select>
+
+    <label>Фильтр:</label>
+    <select id="filterSelect">
+      <option value="none">Нет</option>
+      <option value="vintage">Винтаж</option>
+      <option value="bw">Ч/б</option>
+    </select>
+
+    <button id="download">Скачать</button>
   </div>
 </div>
 
 <script>
-const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
-let mainPhoto = null;
+const canvas = document.getElementById('editor');
+const ctx = canvas.getContext('2d');
 
-// Функция загрузки фото
-document.getElementById('upload').addEventListener('change', function(e){
-  const reader = new FileReader();
-  reader.onload = function(event){
-    fabric.Image.fromURL(event.target.result, function(img){
-      img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
-      img.scaleToWidth(canvas.width);
-      mainPhoto = img;
-      canvas.clear();
-      canvas.add(img);
-      canvas.sendToBack(img);
-      canvas.renderAll();
-    }, { crossOrigin: 'anonymous' });
+let photo = null;
+let photoScale = 1;
+let photoX = 0;
+let photoY = 0;
+
+let frame = null;
+
+let decorations = [];
+
+let currentFilter = 'none';
+
+function render() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if (photo) {
+    ctx.save();
+    ctx.translate(canvas.width/2, canvas.height/2);
+    ctx.scale(photoScale, photoScale);
+    ctx.drawImage(photo, -photo.width/2, -photo.height/2);
+    ctx.restore();
   }
-  reader.readAsDataURL(e.target.files[0]);
+
+  decorations.forEach(dec => {
+    ctx.save();
+    ctx.translate(dec.x, dec.y);
+    ctx.scale(dec.scale, dec.scale);
+    ctx.drawImage(dec.img, -dec.img.width/2, -dec.img.height/2);
+    ctx.restore();
+  });
+
+  if (frame) {
+    ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+  }
+
+  if (currentFilter === 'vintage') {
+    ctx.fillStyle = 'rgba(255, 220, 180, 0.2)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+
+  if (currentFilter === 'bw') {
+    let imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+    let d = imgData.data;
+    for (let i=0; i<d.length; i+=4) {
+      let avg = (d[i] + d[i+1] + d[i+2]) / 3;
+      d[i] = d[i+1] = d[i+2] = avg;
+    }
+    ctx.putImageData(imgData,0,0);
+  }
+}
+
+// Загрузка фото
+upload.addEventListener('change', e => {
+  let file = e.target.files[0];
+  if (!file) return;
+  let img = new Image();
+  img.onload = () => {
+    photo = img;
+    photoScale = 1;
+    render();
+  };
+  img.src = URL.createObjectURL(file);
 });
 
-// Добавление рамки
-function addFrame(url){
-  fabric.Image.fromURL(url, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
-    img.scaleToWidth(canvas.width);
-    canvas.add(img);
-    canvas.setActiveObject(img);
-    canvas.renderAll();
-  }, { crossOrigin: 'anonymous' });
-}
+// Масштабирование фото колесиком
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (!photo) return;
+  photoScale += e.deltaY * -0.001;
+  if (photoScale < 0.2) photoScale = 0.2;
+  render();
+});
+
+// Выбор рамки
+document.getElementById('frameSelect').addEventListener('change', e => {
+  let val = e.target.value;
+  if (val === 'none') {
+    frame = null;
+    render();
+    return;
+  }
+  let img = new Image();
+  img.onload = () => {
+    frame = img;
+    render();
+  };
+  img.src = 'images/' + val;
+});
 
 // Добавление украшений
-function addDecoration(url){
-  fabric.Image.fromURL(url, function(img){
-    img.set({ left: canvas.width/2, top: canvas.height/2, originX:'center', originY:'center', selectable:true });
-    img.scale(0.2);
-    canvas.add(img);
-    canvas.setActiveObject(img);
-    canvas.renderAll();
-  }, { crossOrigin: 'anonymous' });
-}
+document.getElementById('decorSelect').addEventListener('change', e => {
+  let val = e.target.value;
+  if (val === 'none') return;
 
-// Применение фильтров
-function applyFilter(){
-  if(!mainPhoto) return;
-  const filter = document.getElementById('filterSelect').value;
-  mainPhoto.filters = [];
-  if(filter === 'vintage'){
-    mainPhoto.filters.push(new fabric.Image.filters.Sepia());
-  } else if(filter === 'grayscale'){
-    mainPhoto.filters.push(new fabric.Image.filters.Grayscale());
-  }
-  mainPhoto.applyFilters();
-  canvas.renderAll();
-}
+  let img = new Image();
+  img.onload = () => {
+    decorations.push({
+      img,
+      x: canvas.width/2,
+      y: canvas.height/2,
+      scale: 1
+    });
+    render();
+  };
+  img.src = 'images/' + val;
 
-// Удаление выбранного объекта
-function deleteObject(){
-  const active = canvas.getActiveObject();
-  if(active){
-    if(active === mainPhoto) mainPhoto = null;
-    canvas.remove(active);
-    canvas.renderAll();
-  }
-}
-
-// Скачивание итогового изображения
-function downloadImage(){
-  const dataURL = canvas.toDataURL({ format:'png', multiplier:2 });
-  const link = document.createElement('a');
-  link.href = dataURL;
-  link.download = 'newyear_photo.png';
-  link.click();
-}
-
-// Масштабирование основного фото колесиком мыши
-canvas.on('mouse:wheel', function(opt){
-  if(!mainPhoto) return;
-  const delta = opt.e.deltaY;
-  let scale = mainPhoto.scaleX - delta/500;
-  scale = Math.max(0.1, Math.min(5, scale));
-  mainPhoto.scale(scale);
-  canvas.renderAll();
-  opt.e.preventDefault();
-  opt.e.stopPropagation();
+  e.target.value = 'none';
 });
 
-// Перетаскивание и масштабирование объектов
-canvas.on('object:moving', function(e){ e.target.setCoords(); });
-canvas.on('object:scaling', function(e){ e.target.setCoords(); });
+// Фильтры
+document.getElementById('filterSelect').addEventListener('change', e => {
+  currentFilter = e.target.value;
+  render();
+});
 
-// Падающий снег
-for(let i=0;i<50;i++){
-  const snow = document.createElement('div');
-  snow.className='snowflake';
-  snow.style.left=Math.random()*window.innerWidth+'px';
-  snow.style.animationDuration=(5+Math.random()*5)+'s';
-  snow.style.fontSize=(10+Math.random()*10)+'px';
-  snow.innerHTML='❄';
-  document.body.appendChild(snow);
-}
+// Скачать
+
+document.getElementById('download').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'edited-photo.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
 </script>
 </body>
 </html>

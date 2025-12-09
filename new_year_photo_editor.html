@@ -3,139 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <title>Новогодний аватар</title>
+
 <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        background: url("images/fon-saita.png") center/cover no-repeat fixed;
-        background-color: #0d1323;
-        font-family: Arial, sans-serif;
-        color: #fff;
-        min-height: 100vh;
-    }
+body {
+    margin: 0;
+    background: url("images/background.jpg") center/cover no-repeat fixed; /* фон на всю страницу */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
 
-    .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 40px 20px;
-    }
+.editor {
+    background: rgba(0,0,0,0.6); /* полупрозрачный блок */
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.7);
+    display: flex;
+    gap: 20px;
+}
 
-    h1 {
-        text-align: center;
-        font-size: 42px;
-        margin-bottom: 10px;
-        text-shadow: 0 0 10px #000;
-    }
+.tools {
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #fff;
+}
 
-    h2 {
-        text-align: center;
-        font-size: 24px;
-        margin-bottom: 30px;
-        text-shadow: 0 0 10px #000;
-    }
+.tools h3 {
+    margin-bottom: 5px;
+}
 
-    .editor {
-        background: rgba(255,255,255,0.08);
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-    }
+.tools button,
+.tools input {
+    padding: 8px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    cursor: pointer;
+}
 
-    .tools {
-        width: 220px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+.avatar-area {
+    width: 450px;
+    height: 450px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+}
 
-    .tools h3 {
-        margin: 10px 0 5px;
-    }
+#avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* полностью помещаем фото */
+    background: #111;
+}
 
-    .tools button,
-    .tools input {
-        padding: 8px;
-        border-radius: 10px;
-        border: none;
-        background: rgba(255,255,255,0.15);
-        color: #fff;
-        cursor: pointer;
-        transition: 0.2s;
-    }
+.decoration-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
 
-    .tools button:hover,
-    .tools input:hover {
-        background: rgba(255,255,255,0.3);
-    }
-
-    .avatar-area {
-        width: 450px;
-        max-width: 90vw;
-        height: 450px;
-        max-height: 90vw;
-        background: rgba(255,255,255,0.05);
-        border-radius: 15px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    #avatar {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .decoration-layer {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-    }
-
-    .decoration-layer img {
-        position: absolute;
-    }
+.decoration-layer img {
+    position: absolute;
+}
 </style>
 </head>
 <body>
-<div class="container">
-    <h1>Новогодний аватар</h1>
-    <h2>Загрузите фото и украсьте его рамками, шапками и фильтрами!</h2>
 
-    <div class="editor">
-        <div class="tools">
-            <h3>Фото</h3>
-            <input type="file" id="upload" accept="image/*">
+<div class="editor">
+    <div class="tools">
+        <h3>Фото</h3>
+        <input type="file" id="upload" accept="image/*">
 
-            <h3>Рамки</h3>
-            <button onclick="setFrame('images/frame1.png')">Снежинки</button>
-            <button onclick="setFrame('images/frame2.png')">Узор</button>
-            <button onclick="setFrame(null)">Удалить рамку</button>
+        <h3>Рамки</h3>
+        <button onclick="setFrame('images/frame1.png')">Снежинки</button>
+        <button onclick="setFrame('images/frame2.png')">Узор</button>
+        <button onclick="setFrame(null)">Удалить рамку</button>
 
-            <h3>Шапки</h3>
-            <button onclick="setHat('images/hat1.png')">Шапка Санты</button>
-            <button onclick="setHat('images/hat2.png')">Эльф</button>
-            <button onclick="setHat(null)">Удалить шапку</button>
+        <h3>Шапки</h3>
+        <button onclick="setHat('images/hat1.png')">Шапка Санты</button>
+        <button onclick="setHat('images/hat2.png')">Эльф</button>
+        <button onclick="setHat(null)">Удалить шапку</button>
 
-            <h3>Фильтры</h3>
-            <button onclick="setFilter('none')">Нет</button>
-            <button onclick="setFilter('brightness(1.2) sepia(0.1)')">Тёплый золотой свет</button>
-            <button onclick="setFilter('brightness(0.9) saturate(1.2) hue-rotate(180deg)')">Холодный декабрь</button>
-            <button onclick="setFilter('brightness(1.1) sepia(0.3) hue-rotate(-10deg)')">Рождественский</button>
-            <button onclick="setFilter('contrast(1.1) sepia(0.1) grayscale(0.05)')">Мягкий винтаж</button>
+        <h3>Фильтры</h3>
+        <button onclick="setFilter('none')">Нет</button>
+        <button onclick="setFilter('brightness(1.2) saturate(1.2)')">Тёплый свет</button>
+        <button onclick="setFilter('contrast(1.1) sepia(0.1)')">Рождественский</button>
+        <button onclick="setFilter('contrast(1.1) sepia(0.1) grayscale(10%)')">Мягкий винтаж</button>
 
-            <h3>Экспорт</h3>
-            <button onclick="downloadAvatar()">Скачать PNG</button>
-        </div>
+        <h3>Экспорт</h3>
+        <button onclick="downloadAvatar()">Скачать PNG</button>
+    </div>
 
-        <div class="avatar-area" id="avatarArea">
-            <img id="avatar">
-            <div class="decoration-layer" id="decorations"></div>
-        </div>
+    <div class="avatar-area" id="avatarArea">
+        <img id="avatar">
+        <div class="decoration-layer" id="decorations"></div>
     </div>
 </div>
 
@@ -152,16 +120,8 @@ document.getElementById("upload").addEventListener("change", e => {
 });
 
 function setFilter(f) { avatar.style.filter = f; }
-
-function setFrame(src) {
-    frameSrc = src;
-    renderDecorations();
-}
-
-function setHat(src) {
-    hatSrc = src;
-    renderDecorations();
-}
+function setFrame(src) { frameSrc = src; renderDecorations(); }
+function setHat(src) { hatSrc = src; renderDecorations(); }
 
 function renderDecorations() {
     decorations.innerHTML = "";
@@ -197,29 +157,36 @@ async function loadImageAsync(src) {
 async function downloadAvatar() {
     if (!avatar.src) return alert("Сначала загрузите фото!");
 
-    const size = 1000;
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-
-    // фото
     const base = await loadImageAsync(avatar.src);
-    ctx.filter = getComputedStyle(avatar).filter;
-    ctx.drawImage(base, 0, 0, size, size);
+    const maxSize = 1000;
 
-    // рамка
-    if (frameSrc) {
-        const fr = await loadImageAsync(frameSrc);
-        ctx.drawImage(fr, 0, 0, size, size);
+    let w, h;
+    const aspect = base.width / base.height;
+    if (aspect > 1) {
+        w = maxSize;
+        h = maxSize / aspect;
+    } else {
+        h = maxSize;
+        w = maxSize * aspect;
     }
 
-    // шапка
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.filter = getComputedStyle(avatar).filter;
+    ctx.drawImage(base, 0, 0, w, h);
+
+    if (frameSrc) {
+        const fr = await loadImageAsync(frameSrc);
+        ctx.drawImage(fr, 0, 0, w, h);
+    }
+
     if (hatSrc) {
         const hat = await loadImageAsync(hatSrc);
-        const hatW = size * 0.35;
+        const hatW = w * 0.35;
         const hatH = hat.height / hat.width * hatW;
-        ctx.drawImage(hat, size/2 - hatW/2, size*0.02, hatW, hatH);
+        ctx.drawImage(hat, w/2 - hatW/2, h*0.02, hatW, hatH);
     }
 
     const link = document.createElement("a");
@@ -228,5 +195,6 @@ async function downloadAvatar() {
     link.click();
 }
 </script>
+
 </body>
 </html>

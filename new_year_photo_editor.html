@@ -1,151 +1,252 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Новогодний редактор</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
+/* ---------- ФОН ---------- */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: url('images/background.jpg') center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
-        background: url("images/background.jpg") center/cover no-repeat fixed;
+/* ---------- КОНТЕЙНЕР РЕДАКТОРА ---------- */
+.editor-container {
+  position: relative;
+  background: rgba(0,0,0,0.6);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 700px;
+  box-sizing: border-box;
+}
 
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
-        padding: 20px;
-    }
+/* ---------- ХОЛСТ ---------- */
+canvas {
+  display: block;
+  border-radius: 12px;
+  border: 2px solid #fff;
+  background-color: transparent;
+  width: 100% !important;
+  height: auto !important;
+}
 
-    /* Гирлянды */
-    .garland {
-        position: fixed;
-        width: 280px;
-        pointer-events: none;
-        z-index: 10;
-    }
-    .garland.left { top: 0; left: 0; }
-    .garland.right { top: 0; right: 0; transform: scaleX(-1); }
+/* ---------- КНОПКИ И ТУМБЫ ---------- */
+.controls {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
 
-    .editor-container {
-        width: 100%;
-        max-width: 700px;
-        background: rgba(0, 0, 0, 0.55);
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 0 25px rgba(0,0,0,0.6);
-    }
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-    canvas {
-        border-radius: 12px;
-        border: 2px solid #fff;
-        display: block;
-    }
+.thumb {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #fff3;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .controls {
-        margin-top: 15px;
-        text-align: center;
-    }
+.thumb img {
+  max-width: 100%;
+  max-height: 100%;
+}
 
-    input[type="file"] {
-        padding: 10px 12px;
-        background: rgba(255,255,255,0.25);
-        border-radius: 8px;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-    }
+input[type="file"], button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+input[type="file"]:hover, button:hover {
+  background: rgba(255,215,0,0.7);
+}
 </style>
 </head>
 <body>
 
-    <!-- гирлянды -->
-    <img src="images/garland-left.png" class="garland left">
-    <img src="images/garland-right.png" class="garland right">
+<div class="editor-container">
+  <canvas id="canvas"></canvas>
 
-    <div class="editor-container">
-        <canvas id="canvas"></canvas>
+  <div class="controls">
+    <input type="file" id="upload" accept="image/*">
 
-        <div class="controls">
-            <input type="file" id="upload" accept="image/*">
-        </div>
+    <div>
+      <div>Рамки:</div>
+      <div class="thumbs" id="framesList"></div>
     </div>
 
+    <div>
+      <div>Украшения:</div>
+      <div class="thumbs" id="decorList"></div>
+    </div>
+
+    <button id="download">Скачать фото</button>
+  </div>
+</div>
+
 <script>
-    const canvas = new fabric.Canvas("canvas", {
-        preserveObjectStacking: true
+/* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
+const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
+let mainPhoto = null;
+
+/* ---------- АДАПТИВНЫЙ РАЗМЕР КАНВАСА ---------- */
+function resizeCanvas() {
+  const screenW = window.innerWidth;
+  const screenH = window.innerHeight;
+
+  const margin = 180; // место под верх/низ, гирлянды, отступы
+  const size = Math.min(screenW - 40, screenH - margin);
+
+  const finalSize = Math.max(250, size); // не меньше 250px
+
+  canvas.setWidth(finalSize);
+  canvas.setHeight(finalSize);
+
+  document.querySelector(".editor-container").style.width = finalSize + "px";
+
+  canvas.renderAll();
+
+  if (mainPhoto) {
+    mainPhoto.center();
+    canvas.renderAll();
+  }
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+/* ---------- ЗАГРУЗКА ФОТО ---------- */
+document.getElementById('upload').addEventListener('change', function(e){
+  const reader = new FileReader();
+  reader.onload = function(event){
+    fabric.Image.fromURL(event.target.result, function(img){
+      img.set({ 
+        left: canvas.width/2, 
+        top: canvas.height/2, 
+        originX:'center', 
+        originY:'center',
+        selectable:true
+      });
+
+      const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+      img.scale(scale);
+
+      mainPhoto = img;
+      canvas.clear();
+      canvas.add(img);
+      canvas.sendToBack(img);
+      canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
+  };
+  reader.readAsDataURL(e.target.files[0]);
+});
+
+/* ---------- ЗУМ КОЛЕСИКОМ ---------- */
+canvas.on('mouse:wheel', function(opt){
+  if(!mainPhoto) return;
+
+  const delta = opt.e.deltaY;
+  let scale = mainPhoto.scaleX - delta / 500;
+  scale = Math.max(0.1, Math.min(5, scale));
+
+  mainPhoto.scale(scale);
+  canvas.renderAll();
+  opt.e.preventDefault();
+  opt.e.stopPropagation();
+});
+
+/* ---------- ДВИЖЕНИЕ ---------- */
+canvas.on('object:moving', e => e.target.setCoords());
+
+/* ---------- РАМКИ И УКРАШЕНИЯ ---------- */
+const frames = [
+  {name:'Снежная рамка', url:'images/frame1.png'},
+  {name:'Рамка с узорами', url:'images/frame2.png'}
+];
+
+const decorations = [
+  {name:'Шапка Деда Мороза', url:'images/hat1.png'},
+  {name:'Шарик красный', url:'images/ball1.png'}
+];
+
+const framesList = document.getElementById('framesList');
+const decorList = document.getElementById('decorList');
+
+function createThumb(item, isDecoration){
+  const div = document.createElement('div');
+  div.className = 'thumb';
+  const img = document.createElement('img');
+  img.src = item.url;
+  div.appendChild(img);
+
+  div.addEventListener('click', ()=>{
+    fabric.Image.fromURL(item.url, function(obj){
+      obj.set({
+        left: canvas.width/2,
+        top: canvas.height/2,
+        originX:'center',
+        originY:'center',
+        selectable:true
+      });
+
+      if(isDecoration) obj.scale(0.4);
+      else {
+        const scale = Math.max(canvas.width / obj.width, canvas.height / obj.height);
+        obj.scale(scale);
+      }
+
+      canvas.add(obj);
+      canvas.setActiveObject(obj);
+      canvas.renderAll();
     });
-    let mainPhoto = null;
+  });
 
-    /* АДАПТИВ CANVAS */
-    function resizeCanvas() {
-        const size = document.querySelector(".editor-container").clientWidth;
-        canvas.setWidth(size);
-        canvas.setHeight(size);   // квадрат
-        canvas.renderAll();
+  return div;
+}
 
-        if (mainPhoto) {
-            mainPhoto.center();
-            canvas.renderAll();
-        }
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+frames.forEach(f=> framesList.appendChild(createThumb(f,false)));
+decorations.forEach(d=> decorList.appendChild(createThumb(d,true)));
 
-    /* ЗАГРУЗКА ФОТО */
-    document.getElementById("upload").addEventListener("change", function(e) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            fabric.Image.fromURL(event.target.result, function(img) {
-                mainPhoto = img;
-
-                canvas.clear();
-
-                const scale = Math.min(
-                    canvas.width / img.width,
-                    canvas.height / img.height
-                );
-
-                img.set({
-                    left: canvas.width / 2,
-                    top: canvas.height / 2,
-                    originX: "center",
-                    originY: "center"
-                });
-
-                img.scale(scale);
-
-                canvas.add(img);
-                canvas.sendToBack(img);
-                canvas.renderAll();
-            });
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    });
-
-    /* МАСШТАБ КОЛЕСИКОМ */
-    canvas.on("mouse:wheel", function(opt) {
-        if (!mainPhoto) return;
-
-        let delta = opt.e.deltaY;
-        let newScale = mainPhoto.scaleX - delta / 500;
-
-        newScale = Math.max(0.1, Math.min(5, newScale));
-
-        mainPhoto.scale(newScale);
-
-        canvas.renderAll();
-
-        opt.e.preventDefault();
-        opt.e.stopPropagation();
-    });
-
+/* ---------- СКАЧАТЬ ---------- */
+document.getElementById('download').addEventListener('click', ()=>{
+  canvas.discardActiveObject();
+  canvas.renderAll();
+  const data = canvas.toDataURL({format:'png', multiplier:2});
+  const link = document.createElement('a');
+  link.href = data;
+  link.download = 'newyear_photo.png';
+  link.click();
+});
 </script>
+
 </body>
 </html>

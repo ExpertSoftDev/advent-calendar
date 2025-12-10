@@ -30,65 +30,42 @@ body {
 .garland.left { top: 0; left: 0; }
 .garland.right { top: 0; right: 0; transform: scaleX(-1); }
 
-/* контейнер редактора */
-.editor-container {
-  position: relative;
-  background: rgba(0,0,0,0.55);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 25px rgba(0,0,0,0.6);
+/* главный контейнер */
+.editor-wrapper {
+  display: flex;
+  gap: 20px;
   width: 100%;
-  max-width: 700px;
-  box-sizing: border-box;
+  max-width: 1000px;
 }
 
-/* canvas без бордера */
+/* левый блок — холст */
+.editor-canvas {
+  flex: 1;
+  background: rgba(0,0,0,0.55);
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
+}
+
+/* холст */
 canvas {
   display: block;
   border-radius: 12px;
-  /* border: 2px solid #fff; ← полностью убираем */
   background-color: transparent;
-  width: auto;
+  width: 100%;
   height: auto;
-  max-width: 100%;
   box-sizing: border-box;
 }
 
-/* кнопки и миниатюры */
-.controls {
-  margin-top: 12px;
+/* правый блок — панель управления */
+.editor-panel {
+  width: 200px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  align-items: center;
 }
 
-.thumbs {
-  display: flex;
-  gap: 10px;
-  margin-top: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.thumb {
-  width: 60px;
-  height: 60px;
-  border: 1px solid #fff3;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.thumb img {
-  max-width: 100%;
-  max-height: 100%;
-}
-
-input[type="file"], button {
+.editor-panel input[type="file"], .editor-panel button {
   padding: 8px 12px;
   border-radius: 8px;
   border: none;
@@ -97,8 +74,36 @@ input[type="file"], button {
   color: #fff;
 }
 
-input[type="file"]:hover, button:hover {
+.editor-panel input[type="file"]:hover, .editor-panel button:hover {
   background: rgba(255,215,0,0.7);
+}
+
+.thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+  border: 1px solid #fff3;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.thumb {
+  width: 100%;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff3;
+}
+
+.thumb img {
+  max-width: 100%;
+  max-height: 100%;
 }
 </style>
 </head>
@@ -108,26 +113,19 @@ input[type="file"]:hover, button:hover {
 <img src="images/garland-left.png" class="garland left">
 <img src="images/garland-right.png" class="garland right">
 
-<div class="editor-container">
-  <canvas id="canvas"></canvas>
+<div class="editor-wrapper">
 
-  <div class="controls">
+  <!-- холст -->
+  <div class="editor-canvas">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- панель -->
+  <div class="editor-panel">
     <input type="file" id="upload" accept="image/*">
-
-    <div>
-      <div>Рамки:</div>
-      <div class="thumbs" id="framesList"></div>
-    </div>
-
-    <div>
-      <div>Украшения:</div>
-      <div class="thumbs" id="decorList"></div>
-    </div>
-
-    <div style="display:flex; gap:10px; flex-wrap: wrap; justify-content:center;">
-      <button id="delete">Удалить выбранное</button>
-      <button id="download">Скачать фото</button>
-    </div>
+    <div class="thumbs" id="decorList"></div>
+    <button id="delete">Удалить выбранное</button>
+    <button id="download">Скачать фото</button>
   </div>
 </div>
 
@@ -137,21 +135,17 @@ let mainPhoto = null;
 
 /* адаптивный холст */
 function resizeCanvas() {
-  const screenW = window.innerWidth;
-  const screenH = window.innerHeight;
-  const margin = 180;
-  const size = Math.min(screenW - 40, screenH - margin);
-  const finalSize = Math.max(250, size);
-  canvas.setWidth(finalSize);
-  canvas.setHeight(finalSize);
-  document.querySelector(".editor-container").style.width = finalSize + "px";
+  const canvasContainer = document.querySelector('.editor-canvas');
+  const width = canvasContainer.clientWidth;
+  canvas.setWidth(width);
+  canvas.setHeight(width); // квадратный холст
   canvas.renderAll();
-  if (mainPhoto) {
+  if(mainPhoto) {
     mainPhoto.center();
     canvas.renderAll();
   }
 }
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 /* загрузка фото */
@@ -193,20 +187,16 @@ canvas.on('mouse:wheel', function(opt){
 /* перемещение объектов */
 canvas.on('object:moving', e => e.target.setCoords());
 
-/* рамки и украшения */
-const frames = [
-  {name:'Снежная рамка', url:'images/frame1.png'},
-  {name:'Рамка с узорами', url:'images/frame2.png'}
-];
+/* decorations — единая сущность */
 const decorations = [
   {name:'Шапка Деда Мороза', url:'images/hat1.png'},
-  {name:'Шарик красный', url:'images/ball1.png'}
+  {name:'Шарик красный', url:'images/ball1.png'},
+  {name:'Снежинка', url:'images/snowflake1.png'}
 ];
 
-const framesList = document.getElementById('framesList');
 const decorList = document.getElementById('decorList');
 
-function createThumb(item, isDecoration){
+function createThumb(item){
   const div = document.createElement('div');
   div.className = 'thumb';
   const img = document.createElement('img');
@@ -222,11 +212,7 @@ function createThumb(item, isDecoration){
         originY:'center',
         selectable:true
       });
-      if(isDecoration) obj.scale(0.4);
-      else {
-        const scale = Math.max(canvas.width / obj.width, canvas.height / obj.height);
-        obj.scale(scale);
-      }
+      obj.scale(0.4);
       canvas.add(obj);
       canvas.setActiveObject(obj);
       canvas.renderAll();
@@ -236,10 +222,9 @@ function createThumb(item, isDecoration){
   return div;
 }
 
-frames.forEach(f=> framesList.appendChild(createThumb(f,false)));
-decorations.forEach(d=> decorList.appendChild(createThumb(d,true)));
+decorations.forEach(d=> decorList.appendChild(createThumb(d)));
 
-/* удалить выбранный объект */
+/* удалить выбранное */
 document.getElementById('delete').addEventListener('click', ()=>{
   const active = canvas.getActiveObject();
   if(active && active !== mainPhoto){

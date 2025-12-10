@@ -24,8 +24,17 @@ body {
 h1 {
   color: #fff;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+}
+
+/* подзаголовок */
+h2 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: normal;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
 
 /* главный контейнер */
@@ -115,6 +124,7 @@ canvas {
 <body>
 
 <h1>Адвент Expert Soft</h1>
+<h2>Создай свою новогоднюю аватарку</h2>
 
 <div class="editor-wrapper">
 
@@ -128,6 +138,8 @@ canvas {
     <input type="file" id="upload" accept="image/*">
     <div class="thumbs" id="decorList"></div>
     <button id="delete">Удалить выбранное</button>
+    <button id="bringFront">Поднять</button>
+    <button id="sendBack">Опустить</button>
     <button id="download">Скачать фото</button>
   </div>
 </div>
@@ -164,8 +176,8 @@ const decorations = [
 function resizeCanvas() {
   const canvasContainer = document.querySelector('.editor-canvas');
   const panelWidth = document.querySelector('.editor-panel').offsetWidth;
-  const maxWidth = window.innerWidth - panelWidth - 60; // отступы
-  const maxHeight = window.innerHeight - 150; // отступ сверху + заголовок
+  const maxWidth = window.innerWidth - panelWidth - 60;
+  const maxHeight = window.innerHeight - 150;
   const size = Math.min(maxWidth, maxHeight);
   const finalSize = Math.max(250, size);
 
@@ -260,6 +272,24 @@ document.getElementById('delete').addEventListener('click', ()=>{
   if(active && active !== mainPhoto){
     canvas.remove(active);
     canvas.discardActiveObject();
+    canvas.renderAll();
+  }
+});
+
+/* поднять слой */
+document.getElementById('bringFront').addEventListener('click', ()=>{
+  const active = canvas.getActiveObject();
+  if(active && active !== mainPhoto){
+    canvas.bringToFront(active);
+    canvas.renderAll();
+  }
+});
+
+/* опустить слой */
+document.getElementById('sendBack').addEventListener('click', ()=>{
+  const active = canvas.getActiveObject();
+  if(active && active !== mainPhoto){
+    canvas.sendBackwards(active);
     canvas.renderAll();
   }
 });

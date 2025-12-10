@@ -6,16 +6,18 @@
 <title>Новогодний редактор</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: url('images/background.jpg') center/cover no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    position: relative;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: url('images/background.jpg') center/cover no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* было center — ломало адаптив */
+  min-height: 100vh; /* вместо жёсткого height */
+  padding: 20px; /* чтобы контент не упирался в края */
+  box-sizing: border-box;
+}
 
   .editor-container {
     position: relative;
@@ -25,12 +27,24 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     z-index: 1;
   }
+  /* Адаптивные размеры контейнера */
+.editor-container {
+  width: 100%;
+  max-width: 700px;
+  box-sizing: border-box;
+}
 
   canvas {
     border-radius: 12px;
     border: 2px solid #fff;
     background-color: transparent;
   }
+  /* Делаем холст адаптивным */
+canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 80vh;
+}
 
   .controls {
     margin-top: 12px;
@@ -199,6 +213,22 @@
     link.click();
   });
 
+  function resizeCanvas() {
+  const containerWidth = document.querySelector('.editor-container').clientWidth;
+
+  canvas.setWidth(containerWidth);
+  canvas.setHeight(containerWidth); // квадратный холст
+  canvas.renderAll();
+
+  // если фото уже загружено — центрируем
+  if (mainPhoto) {
+    mainPhoto.center();
+    canvas.renderAll();
+  }
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 </script>
 </body>
 </html>

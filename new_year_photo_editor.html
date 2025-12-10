@@ -8,7 +8,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 
 <style>
-/* ---------- ФОН ---------- */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -21,29 +20,41 @@ body {
   box-sizing: border-box;
 }
 
-/* ---------- КОНТЕЙНЕР РЕДАКТОРА ---------- */
+/* гирлянды по краям страницы */
+.garland {
+  position: fixed;
+  width: 300px;
+  pointer-events: none;
+  z-index: 10;
+}
+.garland.left { top: 0; left: 0; }
+.garland.right { top: 0; right: 0; transform: scaleX(-1); }
+
+/* контейнер редактора */
 .editor-container {
   position: relative;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.55);
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
   width: 100%;
   max-width: 700px;
   box-sizing: border-box;
 }
 
-/* ---------- ХОЛСТ ---------- */
+/* canvas без растяжки */
 canvas {
   display: block;
   border-radius: 12px;
-  border: 2px solid #fff;
+  border: 2px solid #fff; /* убрать, если не нужно */
   background-color: transparent;
-  width: 100% !important;
-  height: auto !important;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* ---------- КНОПКИ И ТУМБЫ ---------- */
+/* кнопки и миниатюры */
 .controls {
   margin-top: 12px;
   display: flex;
@@ -93,6 +104,10 @@ input[type="file"]:hover, button:hover {
 </head>
 <body>
 
+<!-- гирлянды -->
+<img src="images/garland-left.png" class="garland left">
+<img src="images/garland-right.png" class="garland right">
+
 <div class="editor-container">
   <canvas id="canvas"></canvas>
 
@@ -109,42 +124,37 @@ input[type="file"]:hover, button:hover {
       <div class="thumbs" id="decorList"></div>
     </div>
 
-    <button id="download">Скачать фото</button>
+    <div style="display:flex; gap:10px; flex-wrap: wrap; justify-content:center;">
+      <button id="delete">Удалить выбранное</button>
+      <button id="download">Скачать фото</button>
+    </div>
   </div>
 </div>
 
 <script>
-/* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
 const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
 let mainPhoto = null;
 
-/* ---------- АДАПТИВНЫЙ РАЗМЕР КАНВАСА ---------- */
+/* адаптивный холст */
 function resizeCanvas() {
   const screenW = window.innerWidth;
   const screenH = window.innerHeight;
-
-  const margin = 180; // место под верх/низ, гирлянды, отступы
+  const margin = 180;
   const size = Math.min(screenW - 40, screenH - margin);
-
-  const finalSize = Math.max(250, size); // не меньше 250px
-
+  const finalSize = Math.max(250, size);
   canvas.setWidth(finalSize);
   canvas.setHeight(finalSize);
-
   document.querySelector(".editor-container").style.width = finalSize + "px";
-
   canvas.renderAll();
-
   if (mainPhoto) {
     mainPhoto.center();
     canvas.renderAll();
   }
 }
-
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-/* ---------- ЗАГРУЗКА ФОТО ---------- */
+/* загрузка фото */
 document.getElementById('upload').addEventListener('change', function(e){
   const reader = new FileReader();
   reader.onload = function(event){
@@ -156,10 +166,8 @@ document.getElementById('upload').addEventListener('change', function(e){
         originY:'center',
         selectable:true
       });
-
       const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
       img.scale(scale);
-
       mainPhoto = img;
       canvas.clear();
       canvas.add(img);
@@ -170,29 +178,26 @@ document.getElementById('upload').addEventListener('change', function(e){
   reader.readAsDataURL(e.target.files[0]);
 });
 
-/* ---------- ЗУМ КОЛЕСИКОМ ---------- */
+/* масштаб колесиком */
 canvas.on('mouse:wheel', function(opt){
   if(!mainPhoto) return;
-
   const delta = opt.e.deltaY;
   let scale = mainPhoto.scaleX - delta / 500;
   scale = Math.max(0.1, Math.min(5, scale));
-
   mainPhoto.scale(scale);
   canvas.renderAll();
   opt.e.preventDefault();
   opt.e.stopPropagation();
 });
 
-/* ---------- ДВИЖЕНИЕ ---------- */
+/* перемещение объектов */
 canvas.on('object:moving', e => e.target.setCoords());
 
-/* ---------- РАМКИ И УКРАШЕНИЯ ---------- */
+/* рамки и украшения */
 const frames = [
   {name:'Снежная рамка', url:'images/frame1.png'},
   {name:'Рамка с узорами', url:'images/frame2.png'}
 ];
-
 const decorations = [
   {name:'Шапка Деда Мороза', url:'images/hat1.png'},
   {name:'Шарик красный', url:'images/ball1.png'}
@@ -217,13 +222,11 @@ function createThumb(item, isDecoration){
         originY:'center',
         selectable:true
       });
-
       if(isDecoration) obj.scale(0.4);
       else {
         const scale = Math.max(canvas.width / obj.width, canvas.height / obj.height);
         obj.scale(scale);
       }
-
       canvas.add(obj);
       canvas.setActiveObject(obj);
       canvas.renderAll();
@@ -236,7 +239,17 @@ function createThumb(item, isDecoration){
 frames.forEach(f=> framesList.appendChild(createThumb(f,false)));
 decorations.forEach(d=> decorList.appendChild(createThumb(d,true)));
 
-/* ---------- СКАЧАТЬ ---------- */
+/* удалить выбранный объект */
+document.getElementById('delete').addEventListener('click', ()=>{
+  const active = canvas.getActiveObject();
+  if(active && active !== mainPhoto){
+    canvas.remove(active);
+    canvas.discardActiveObject();
+    canvas.renderAll();
+  }
+});
+
+/* скачать */
 document.getElementById('download').addEventListener('click', ()=>{
   canvas.discardActiveObject();
   canvas.renderAll();

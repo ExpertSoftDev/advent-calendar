@@ -45,6 +45,9 @@ body {
   padding: 10px;
   border-radius: 15px;
   box-shadow: 0 0 25px rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* холст */
@@ -53,7 +56,7 @@ canvas {
   border-radius: 12px;
   background-color: transparent;
   width: 100%;
-  height: auto;
+  height: 100%;
   box-sizing: border-box;
 }
 
@@ -133,14 +136,30 @@ canvas {
 const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
 let mainPhoto = null;
 
+/* decorations — единая сущность */
+const decorations = [
+  {name:'Шапка Деда Мороза', url:'images/hat1.png'},
+  {name:'Шарик красный', url:'images/ball1.png'},
+  {name:'Снежинка', url:'images/snowflake1.png'}
+];
+
 /* адаптивный холст */
 function resizeCanvas() {
   const canvasContainer = document.querySelector('.editor-canvas');
-  const width = canvasContainer.clientWidth;
-  canvas.setWidth(width);
-  canvas.setHeight(width); // квадратный холст
+  const panelWidth = document.querySelector('.editor-panel').offsetWidth;
+  const maxWidth = window.innerWidth - panelWidth - 60; // отступы
+  const maxHeight = window.innerHeight - 40; // отступ сверху/снизу
+  const size = Math.min(maxWidth, maxHeight);
+  const finalSize = Math.max(250, size);
+
+  canvas.setWidth(finalSize);
+  canvas.setHeight(finalSize);
+  canvasContainer.style.width = finalSize + 'px';
+  canvasContainer.style.height = finalSize + 'px';
+  
   canvas.renderAll();
-  if(mainPhoto) {
+
+  if(mainPhoto){
     mainPhoto.center();
     canvas.renderAll();
   }
@@ -187,13 +206,7 @@ canvas.on('mouse:wheel', function(opt){
 /* перемещение объектов */
 canvas.on('object:moving', e => e.target.setCoords());
 
-/* decorations — единая сущность */
-const decorations = [
-  {name:'Шапка Деда Мороза', url:'images/hat1.png'},
-  {name:'Шарик красный', url:'images/ball1.png'},
-  {name:'Снежинка', url:'images/snowflake1.png'}
-];
-
+/* добавление миниатюр */
 const decorList = document.getElementById('decorList');
 
 function createThumb(item){

@@ -8,12 +8,12 @@
   body {
     margin: 0;
     font-family: "Arial", sans-serif;
-    background: radial-gradient(circle at center, #1a0933, #000);
+    background: radial-gradient(circle at center, #1a0933, #000); /* мистический фон */
     color: #fff;
     overflow-x: hidden;
   }
 
-  /* ⭐ Мигающие звезды */
+  /* ⭐ мигающие звезды */
   .star {
     position: absolute;
     width: 3px;
@@ -36,12 +36,11 @@
     font-size: 42px;
     margin: 0;
     letter-spacing: 1px;
-    color: #ffd700; /* золотистый */
   }
   header h2 {
     font-size: 22px;
     margin-top: 10px;
-    color: #ffd700; /* золотистый */
+    color: #e0c4ff;
   }
 
   .container {
@@ -57,44 +56,39 @@
     backdrop-filter: blur(6px);
     margin-bottom: 35px;
     box-shadow: 0 0 20px rgba(186,134,255,0.3);
-    animation: fadeIn 1.5s ease;
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* блок иконок */
+  /* блок с иконками знаков */
   .zodiac-icons {
     display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    margin-bottom: 35px;
-    padding: 10px 0;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
   }
-  .zodiac-icons::-webkit-scrollbar { display: none; } /* скрыть скроллбар */
   .zodiac-icon {
-    width: 60px;
-    flex-shrink: 0;
-    text-align: center;
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
     cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, border 0.2s;
+  }
+  .zodiac-icon:hover {
+    transform: scale(1.1);
+    border-color: #ffd700;
   }
   .zodiac-icon img {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    border: 2px solid #ffd700;
     object-fit: cover;
   }
-  .zodiac-icon .name {
-    font-size: 12px;
-    margin-top: 3px;
-    color: #ffd700;
-  }
 
-  /* блок гороскопа один под другим */
+  /* каждый знак в отдельном блоке */
   .zodiac-section {
     background: rgba(255,255,255,0.08);
     padding: 20px;
@@ -107,34 +101,44 @@
   }
   .zodiac-section h3 {
     font-size: 22px;
-    margin: 5px 0;
-    color: #ffd700; /* золотистый */
+    margin: 10px 0 5px 0;
   }
   .zodiac-section .dates {
     font-size: 14px;
     margin-bottom: 12px;
-    color: #ffd700; /* золотистый */
+    color: #d9b3ff;
   }
-  .zodiac-section p {
-    max-height: 100px;
+
+  /* разворачиваемый текст */
+  .zodiac-text {
+    max-height: 120px;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: max-height 0.4s ease;
+    text-align: left;
+    margin: 0 auto;
+    line-height: 1.5em;
   }
-  .zodiac-section.expanded p {
-    max-height: 500px; /* можно увеличить для длинного текста */
+  .zodiac-text.expanded {
+    max-height: 1000px; /* достаточно для длинного текста */
   }
   .toggle-btn {
-    cursor: pointer;
-    color: #ffd700;
-    font-size: 14px;
     margin-top: 10px;
-    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
   }
+  .toggle-btn:hover {
+    background: rgba(255,215,0,0.7);
+  }
+
 </style>
 </head>
 <body>
 
-<!-- ⭐ Генерация звезд -->
+<!-- ⭐ Генерация звёзд -->
 <script>
   for (let i = 0; i < 120; i++) {
     const star = document.createElement('div');
@@ -152,90 +156,73 @@
 </header>
 
 <div class="container">
-
   <div class="intro">
     <p>
       Астрология сопровождает человечество тысячи лет, помогая найти ориентиры в период перемен 
-      и заглянуть в грядущие события. Астропрогноз — это не просто предсказание, а символическое 
-      отражение возможных тенденций года, раскрывающее энергии, которые будут влиять на каждый 
-      знак Зодиака.
+      и заглянуть в грядущие события. Астропрогноз — это символическое отражение возможных тенденций года.
     </p>
   </div>
 
-  <!-- блок с иконками -->
+  <!-- блок с иконками всех знаков -->
   <div class="zodiac-icons">
-    <div class="zodiac-icon" data-target="oven"><img src="images/zodiac/oven.jpg" alt="Овен"><div class="name">Овен</div></div>
-    <div class="zodiac-icon" data-target="telec"><img src="images/zodiac/telec.jpg" alt="Телец"><div class="name">Телец</div></div>
-    <div class="zodiac-icon" data-target="bliznecy"><img src="images/zodiac/bliznecy.jpg" alt="Близнецы"><div class="name">Близнецы</div></div>
-    <div class="zodiac-icon" data-target="rak"><img src="images/zodiac/rak.jpg" alt="Рак"><div class="name">Рак</div></div>
-    <div class="zodiac-icon" data-target="lev"><img src="images/zodiac/lev.jpg" alt="Лев"><div class="name">Лев</div></div>
-    <div class="zodiac-icon" data-target="deva"><img src="images/zodiac/deva.jpg" alt="Дева"><div class="name">Дева</div></div>
-    <div class="zodiac-icon" data-target="vesy"><img src="images/zodiac/vesy.jpg" alt="Весы"><div class="name">Весы</div></div>
-    <div class="zodiac-icon" data-target="scorpio"><img src="images/zodiac/scorpio.jpg" alt="Скорпион"><div class="name">Скорпион</div></div>
-    <div class="zodiac-icon" data-target="strelec"><img src="images/zodiac/strelec.jpg" alt="Стрелец"><div class="name">Стрелец</div></div>
-    <div class="zodiac-icon" data-target="kozerog"><img src="images/zodiac/kozerog.jpg" alt="Козерог"><div class="name">Козерог</div></div>
-    <div class="zodiac-icon" data-target="vodoley"><img src="images/zodiac/vodoley.jpg" alt="Водолей"><div class="name">Водолей</div></div>
-    <div class="zodiac-icon" data-target="ryby"><img src="images/zodiac/ryby.jpg" alt="Рыбы"><div class="name">Рыбы</div></div>
+    <div class="zodiac-icon" data-target="aries"><img src="images/zodiac/oven.jpg" alt="Овен"></div>
+    <div class="zodiac-icon" data-target="taurus"><img src="images/zodiac/telec.jpg" alt="Телец"></div>
+    <div class="zodiac-icon" data-target="gemini"><img src="images/zodiac/bliznecy.jpg" alt="Близнецы"></div>
+    <div class="zodiac-icon" data-target="cancer"><img src="images/zodiac/rak.jpg" alt="Рак"></div>
+    <div class="zodiac-icon" data-target="leo"><img src="images/zodiac/lev.jpg" alt="Лев"></div>
+    <div class="zodiac-icon" data-target="virgo"><img src="images/zodiac/deva.jpg" alt="Дева"></div>
+    <div class="zodiac-icon" data-target="libra"><img src="images/zodiac/vesy.jpg" alt="Весы"></div>
+    <div class="zodiac-icon" data-target="scorpio"><img src="images/zodiac/scorpio.jpg" alt="Скорпион"></div>
+    <div class="zodiac-icon" data-target="sagittarius"><img src="images/zodiac/strelec.jpg" alt="Стрелец"></div>
+    <div class="zodiac-icon" data-target="capricorn"><img src="images/zodiac/kozerog.jpg" alt="Козерог"></div>
+    <div class="zodiac-icon" data-target="aquarius"><img src="images/zodiac/vodoley.jpg" alt="Водолей"></div>
+    <div class="zodiac-icon" data-target="pisces"><img src="images/zodiac/ryby.jpg" alt="Рыбы"></div>
   </div>
 
-  <!-- блоки гороскопов -->
-  <div id="zodiac-sections">
-
-    <div class="zodiac-section" id="oven">
-      <img src="images/zodiac/oven.jpg" alt="Овен" />
-      <h3>Овен</h3>
-      <div class="dates">21 марта — 19 апреля</div>
-      <p>Год откроет интересные перспективы. В целом, его смело можно назвать удачным, однако некоторые трудности на пути все же возникнут. Ключ к успеху — сохранять здравый смысл и действовать разумно, взвешенно, а не поддаваться сиюминутным порывам. Умение обуздать свой импульсивный характер станет главным вашим преимуществом.
-
-Старт года, январь и февраль, задаст мощный деловой ритм. Это время невероятной продуктивности и карьерных прорывов. Смело берите инициативу в свои руки — вас ждут удачные переговоры, выгодные предложения о сотрудничестве и реальный шанс подняться по карьерной лестнице. Вероятно улучшение финансового положения, но будьте готовы к тому, что вместе с деньгами придут и новые заботы, большая ответственность. Вам предстоит расставить приоритеты и решить, что для вас важнее. Новые обязанности поначалу могут показаться неподъемными, но если вы готовы учиться и адаптироваться, то справитесь со всем без исключения.
-
-После продуктивного старта вас ждет испытание на прочность — первая половина марта окажется сложной в эмоциональном плане. Могут неожиданно напомнить о себе старые нерешенные проблемы, станет сложнее находить общий язык с близкими, возможны разногласия с любимым человеком. В этот период особенно важно помнить: решать проблемы в отношениях с другими стоит только после того, как вы разберетесь со своими собственными чувствами, обидами и внутренними конфликтами. Проявите мудрость и терпение.
-
-Но любая гроза сменяется ясной погодой. За сложным периодом последует светлая и очень удачная полоса. В течение нескольких последующих месяцев вас ждет стабильность и процветание: финансовое положение станет более прочным, в семье воцарится гармония, во всех сферах жизни начнутся перемены к лучшему. Это время пожинать плоды своего труда и наслаждаться заслуженным покоем.
-
-Осенью акцент сместится на личные отношения. Многие Овны всерьез задумаются о создании семьи или укреплении существующего союза, и звезды будут благоволить этим стремлениям. Однако находясь на позитивной эмоциональной волне, важно не забывать и о практических вещах: обустраивайте свой дом, откладывайте деньги, словом, всячески заботьтесь о будущем в материальном плане. 
-
-Гармония между чувством и расчетом — вот формула вашего успеха в этом году.</p>
-      <span class="toggle-btn">Развернуть</span>
-    </div>
-
-    <div class="zodiac-section" id="telec">
-      <img src="images/zodiac/telec.jpg" alt="Телец" />
-      <h3>Телец</h3>
-      <div class="dates">20 апреля — 20 мая</div>
-      <p>Текст гороскопа для Тельца...</p>
-      <span class="toggle-btn">Развернуть</span>
-    </div>
-
-    <div class="zodiac-section" id="bliznecy">
-      <img src="images/zodiac/bliznecy.jpg" alt="Близнецы" />
-      <h3>Близнецы</h3>
-      <div class="dates">21 мая — 20 июня</div>
-      <p>Текст гороскопа для Близнецов...</p>
-      <span class="toggle-btn">Развернуть</span>
-    </div>
-
-    <!-- добавь остальные знаки по аналогии -->
-
+  <!-- гороскопы по одному -->
+  <div class="zodiac-section" id="aries">
+    <img src="images/zodiac/oven.jpg" alt="Овен" />
+    <h3>Овен</h3>
+    <div class="dates">21 марта — 19 апреля</div>
+    <div class="zodiac-text">Текст гороскопа для Овна... (сюда можно вставить длинный текст)</div>
+    <button class="toggle-btn">Развернуть/Свернуть</button>
   </div>
 
+  <div class="zodiac-section" id="taurus">
+    <img src="images/zodiac/telec.jpg" alt="Телец" />
+    <h3>Телец</h3>
+    <div class="dates">20 апреля — 20 мая</div>
+    <div class="zodiac-text">Текст гороскопа для Тельца...</div>
+    <button class="toggle-btn">Развернуть/Свернуть</button>
+  </div>
+
+  <!-- остальные знаки по аналогии -->
+  <div class="zodiac-section" id="gemini">
+    <img src="images/zodiac/bliznecy.jpg" alt="Близнецы" />
+    <h3>Близнецы</h3>
+    <div class="dates">21 мая — 20 июня</div>
+    <div class="zodiac-text">Текст гороскопа для Близнецов...</div>
+    <button class="toggle-btn">Развернуть/Свернуть</button>
+  </div>
+
+  <!-- остальные знаки продолжаем аналогично -->
 </div>
 
 <script>
-  // переход по клику на иконку
-  document.querySelectorAll('.zodiac-icon').forEach(icon => {
-    icon.addEventListener('click', () => {
-      const target = document.getElementById(icon.dataset.target);
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // разворачивание/сворачивание текста
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+      const text = btn.previousElementSibling;
+      text.classList.toggle('expanded');
     });
   });
 
-  // разворачивание текста
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const section = btn.parentElement;
-      section.classList.toggle('expanded');
-      btn.textContent = section.classList.contains('expanded') ? 'Свернуть' : 'Развернуть';
+  // прокрутка к знаку по клику на иконку
+  document.querySelectorAll('.zodiac-icon').forEach(icon => {
+    icon.addEventListener('click', ()=>{
+      const targetId = icon.dataset.target;
+      const el = document.getElementById(targetId);
+      if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 </script>

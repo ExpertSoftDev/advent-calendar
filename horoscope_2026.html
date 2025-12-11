@@ -3,185 +3,243 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Астропрогноз 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+<title>Астропрогноз 2026 — Адвент Expert Soft</title>
 <style>
   body {
     margin: 0;
-    font-family: 'Montserrat', sans-serif;
-    background: radial-gradient(circle at center, #1c1b33 0%, #0a0a14 100%);
-    color: #f5f5f5;
-  }
-
-  /* фиксированное меню со знаками */
-  .zodiac-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(10, 10, 20, 0.75);
-    backdrop-filter: blur(6px);
-    padding: 10px 0;
-    z-index: 999;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-  }
-
-  .zodiac-nav a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
+    font-family: "Arial", sans-serif;
+    background: radial-gradient(circle at center, #1a0933, #000); /* мистический фон */
     color: #fff;
-    font-size: 12px;
+    overflow-x: hidden;
   }
 
-  .zodiac-nav img {
-    width: 40px;
-    height: 40px;
+  /* ⭐ мигающие звезды */
+  .star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
     border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 215, 0, 0.7);
-    margin-bottom: 4px;
+    opacity: 0.8;
+    animation: twinkle 2s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
   }
 
-  /* отступ, чтобы контент не залез под меню */
-  .page-wrapper {
-    padding-top: 110px;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  /* вступительный блок */
-  .intro {
+  header {
     text-align: center;
-    padding: 40px 20px;
+    padding: 40px 20px 10px;
+  }
+  header h1 {
+    font-size: 42px;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  header h2 {
+    font-size: 22px;
+    margin-top: 10px;
+    color: #e0c4ff;
   }
 
-  .intro h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 48px;
-    margin-bottom: 10px;
-    background: linear-gradient(90deg, #e8d284, #fff8c6, #d4b650);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .intro h2 {
-    font-size: 20px;
-    font-weight: 300;
-    margin-bottom: 25px;
-    color: #dcdcdc;
-  }
-
-  .intro p {
-    line-height: 1.6;
-    max-width: 680px;
+  .container {
+    width: 90%;
+    max-width: 1100px;
     margin: 0 auto;
-    color: #cfcfcf;
   }
 
-  /* блок знака */
-  .sign {
-    margin: 40px 0;
-    padding: 30px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.07);
-    backdrop-filter: blur(4px);
+  /* Блок описания */
+  .intro {
+    background: rgba(255,255,255,0.07);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(6px);
+    margin-bottom: 35px;
+    box-shadow: 0 0 20px rgba(186,134,255,0.3);
+    animation: fadeIn 1.5s ease;
   }
 
-  .sign-header {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .sign-header img {
-    width: 80px;
-    height: 80px;
+  /* Сетка знаков */
+  .zodiac-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-bottom: 50px;
+  }
+
+  .zodiac-card {
+    background: rgba(255,255,255,0.08);
+    padding: 20px;
+    border-radius: 18px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 18px rgba(200,120,255,0.25);
+    animation: cardPop 0.8s ease;
+    position: relative;
+  }
+
+  @keyframes cardPop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .zodiac-card img {
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid rgba(255,215,0,0.8);
+    margin-bottom: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.4);
   }
 
-  .sign-header h3 {
-    font-size: 26px;
-    margin: 0;
-    font-family: 'Playfair Display', serif;
+  .zodiac-card h3 {
+    font-size: 22px;
+    margin: 5px 0;
   }
 
-  .dates {
+  .zodiac-card .dates {
     font-size: 14px;
-    color: #e1e1e1;
-    margin-top: 4px;
+    margin-bottom: 12px;
+    color: #d9b3ff;
   }
 
 </style>
 </head>
 <body>
 
-<!-- Навигация -->
-<div class="zodiac-nav">
-  <!-- Заполни своими иконками: images/aries.png и т.д. -->
-  <a href="#aries"><img src="images/aries.png"><span>Овен</span></a>
-  <a href="#taurus"><img src="images/taurus.png"><span>Телец</span></a>
-  <a href="#gemini"><img src="images/gemini.png"><span>Близнецы</span></a>
-  <a href="#cancer"><img src="images/cancer.png"><span>Рак</span></a>
-  <a href="#leo"><img src="images/leo.png"><span>Лев</span></a>
-  <a href="#virgo"><img src="images/virgo.png"><span>Дева</span></a>
-  <a href="#libra"><img src="images/libra.png"><span>Весы</span></a>
-  <a href="#scorpio"><img src="images/scorpio.png"><span>Скорпион</span></a>
-  <a href="#sagittarius"><img src="images/sagittarius.png"><span>Стрелец</span></a>
-  <a href="#capricorn"><img src="images/capricorn.png"><span>Козерог</span></a>
-  <a href="#aquarius"><img src="images/aquarius.png"><span>Водолей</span></a>
-  <a href="#pisces"><img src="images/pisces.png"><span>Рыбы</span></a>
-</div>
+<!-- ⭐ Генерация звёзд -->
+<script>
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.top = Math.random() * 100 + 'vh';
+    star.style.left = Math.random() * 100 + 'vw';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    document.body.appendChild(star);
+  }
+</script>
 
-<div class="page-wrapper">
+<header>
+  <h1>Адвент Expert Soft</h1>
+  <h2>Астропрогноз на 2026 год</h2>
+</header>
 
-  <!-- вступление -->
-  <section class="intro">
-    <h1>Астропрогноз 2026</h1>
-    <h2>Создай уверенный и гармоничный год</h2>
+<div class="container">
+  <div class="intro">
     <p>
-      Гороскопы появились тысячи лет назад, когда древние астрологи заметили:
-      движение небесных тел отражается на земных событиях. Знаки зодиака стали
-      символами характера, жизненной энергии и судьбоносных циклов. Сегодня
-      астрология — это не предсказания в классическом смысле, а язык
-      архетипов, помогающий лучше понять себя и свои возможности.
+      Астрология сопровождает человечество тысячи лет, помогая найти ориентиры в период перемен 
+      и заглянуть в грядущие события. Астропрогноз — это не просто предсказание, а символическое 
+      отражение возможных тенденций года, раскрывающее энергии, которые будут влиять на каждый 
+      знак Зодиака. 2026 год принесёт новые вызовы, возможности для роста и неожиданные озарения.
     </p>
-  </section>
+  </div>
 
-  <!-- шаблон знака (тексты ты добавишь сама) -->
-  <section id="aries" class="sign">
-    <div class="sign-header">
-      <img src="images/aries.png" alt="Овен">
-      <div>
-        <h3>Овен</h3>
-        <div class="dates">21 марта — 19 апреля</div>
-      </div>
+  <!-- Все 12 знаков -->
+  <div class="zodiac-grid">
+
+    <!-- Овен -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/oven.jpg" alt="Овен" />
+      <h3>Овен</h3>
+      <div class="dates">21 марта — 19 апреля</div>
+      <p>Текст гороскопа для Овна...</p>
     </div>
-    <p>Твой текст...</p>
-  </section>
 
-  <section id="taurus" class="sign">
-    <div class="sign-header">
-      <img src="images/taurus.png" alt="Телец">
-      <div>
-        <h3>Телец</h3>
-        <div class="dates">20 апреля — 20 мая</div>
-      </div>
+    <!-- Телец -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/telec.jpg" alt="Телец" />
+      <h3>Телец</h3>
+      <div class="dates">20 апреля — 20 мая</div>
+      <p>Текст гороскопа для Тельца...</p>
     </div>
-    <p>Твой текст...</p>
-  </section>
 
-  <!-- остальные знаки аналогично -->
+    <!-- Близнецы -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/bliznecy.jpg" alt="Близнецы" />
+      <h3>Близнецы</h3>
+      <div class="dates">21 мая — 20 июня</div>
+      <p>Текст гороскопа для Близнецов...</p>
+    </div>
 
+    <!-- Рак -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/rak.jpg" alt="Рак" />
+      <h3>Рак</h3>
+      <div class="dates">21 июня — 22 июля</div>
+      <p>Текст гороскопа для Рака...</p>
+    </div>
+
+    <!-- Лев -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/lev.jpg" alt="Лев" />
+      <h3>Лев</h3>
+      <div class="dates">23 июля — 22 августа</div>
+      <p>Текст гороскопа для Льва...</p>
+    </div>
+
+    <!-- Дева -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/deva.jpg" alt="Дева" />
+      <h3>Дева</h3>
+      <div class="dates">23 августа — 22 сентября</div>
+      <p>Текст гороскопа для Девы...</p>
+    </div>
+
+    <!-- Весы -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/vesy.jpg" alt="Весы" />
+      <h3>Весы</h3>
+      <div class="dates">23 сентября — 22 октября</div>
+      <p>Текст гороскопа для Весов...</p>
+    </div>
+
+    <!-- Скорпион -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/scorpio.jpg" alt="Скорпион" />
+      <h3>Скорпион</h3>
+      <div class="dates">23 октября — 21 ноября</div>
+      <p>Текст гороскопа для Скорпиона...</p>
+    </div>
+
+    <!-- Стрелец -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/strelec.jpg" alt="Стрелец" />
+      <h3>Стрелец</h3>
+      <div class="dates">22 ноября — 21 декабря</div>
+      <p>Текст гороскопа для Стрельца...</p>
+    </div>
+
+    <!-- Козерог -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/kozerog.jpg" alt="Козерог" />
+      <h3>Козерог</h3>
+      <div class="dates">22 декабря — 19 января</div>
+      <p>Текст гороскопа для Козерога...</p>
+    </div>
+
+    <!-- Водолей -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/vodoley.jpg" alt="Водолей" />
+      <h3>Водолей</h3>
+      <div class="dates">20 января — 18 февраля</div>
+      <p>Текст гороскопа для Водолея...</p>
+    </div>
+
+    <!-- Рыбы -->
+    <div class="zodiac-card">
+      <img src="images/zodiac/ryby.jpg" alt="Рыбы" />
+      <h3>Рыбы</h3>
+      <div class="dates">19 февраля — 20 марта</div>
+      <p>Текст гороскопа для Рыб...</p>
+    </div>
+
+  </div>
 </div>
 
 </body>

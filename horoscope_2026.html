@@ -8,7 +8,7 @@
   body {
     margin: 0;
     font-family: "Arial", sans-serif;
-    background: radial-gradient(circle at center, #1a0933, #000); /* мистический фон */
+    background: radial-gradient(circle at center, #1a0933, #000);
     color: #fff;
     overflow-x: hidden;
   }
@@ -58,38 +58,29 @@
     box-shadow: 0 0 20px rgba(186,134,255,0.3);
   }
 
-  /* блок с иконками знаков */
+  /* Горизонтальный блок с иконками всех знаков */
   .zodiac-icons {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 15px;
+    justify-content: center;
     margin-bottom: 30px;
   }
-  .zodiac-icon {
-    width: 70px; height: 70px;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-    border: 2px solid rgba(255,255,255,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, border 0.2s;
-  }
-  .zodiac-icon:hover {
-    transform: scale(1.1);
-    border-color: #ffd700;
-  }
-  .zodiac-icon img {
-    width: 60px;
-    height: 60px;
+  .zodiac-icons img {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255,255,255,0.4);
+    transition: transform 0.2s;
+  }
+  .zodiac-icons img:hover {
+    transform: scale(1.1);
   }
 
-  /* каждый знак в отдельном блоке */
-  .zodiac-section {
+  /* Блоки конкретных знаков */
+  .zodiac-card {
     background: rgba(255,255,255,0.08);
     padding: 20px;
     border-radius: 18px;
@@ -97,49 +88,50 @@
     backdrop-filter: blur(6px);
     box-shadow: 0 0 18px rgba(200,120,255,0.25);
     margin-bottom: 25px;
-    position: relative;
   }
-  .zodiac-section h3 {
+
+  .zodiac-card img {
+    width: 80px;      /* тот же размер, что и в блоке иконок */
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.4);
+  }
+
+  .zodiac-card h3 {
     font-size: 22px;
-    margin: 10px 0 5px 0;
+    margin: 5px 0;
   }
-  .zodiac-section .dates {
+
+  .zodiac-card .dates {
     font-size: 14px;
     margin-bottom: 12px;
     color: #d9b3ff;
   }
 
-  /* разворачиваемый текст */
-  .zodiac-text {
-    max-height: 120px;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-    text-align: left;
-    margin: 0 auto;
-    line-height: 1.5em;
-  }
-  .zodiac-text.expanded {
-    max-height: 1000px; /* достаточно для длинного текста */
-  }
-  .toggle-btn {
-    margin-top: 10px;
-    background: rgba(255,255,255,0.15);
+  .toggle-text {
+    background: rgba(255,255,255,0.1);
     border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
     color: #fff;
+    padding: 6px 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    cursor: pointer;
   }
-  .toggle-btn:hover {
-    background: rgba(255,215,0,0.7);
+  .toggle-text:hover {
+    background: rgba(255,215,0,0.5);
   }
 
+  .hidden {
+    display: none;
+  }
 </style>
 </head>
 <body>
 
-<!-- ⭐ Генерация звёзд -->
 <script>
+  // ⭐ Генерация звёзд
   for (let i = 0; i < 120; i++) {
     const star = document.createElement('div');
     star.className = 'star';
@@ -159,73 +151,74 @@
   <div class="intro">
     <p>
       Астрология сопровождает человечество тысячи лет, помогая найти ориентиры в период перемен 
-      и заглянуть в грядущие события. Астропрогноз — это символическое отражение возможных тенденций года.
+      и заглянуть в грядущие события. Астропрогноз — это не просто предсказание, а символическое 
+      отражение возможных тенденций года.
     </p>
   </div>
 
-  <!-- блок с иконками всех знаков -->
-  <div class="zodiac-icons">
-    <div class="zodiac-icon" data-target="aries"><img src="images/zodiac/oven.jpg" alt="Овен"></div>
-    <div class="zodiac-icon" data-target="taurus"><img src="images/zodiac/telec.jpg" alt="Телец"></div>
-    <div class="zodiac-icon" data-target="gemini"><img src="images/zodiac/bliznecy.jpg" alt="Близнецы"></div>
-    <div class="zodiac-icon" data-target="cancer"><img src="images/zodiac/rak.jpg" alt="Рак"></div>
-    <div class="zodiac-icon" data-target="leo"><img src="images/zodiac/lev.jpg" alt="Лев"></div>
-    <div class="zodiac-icon" data-target="virgo"><img src="images/zodiac/deva.jpg" alt="Дева"></div>
-    <div class="zodiac-icon" data-target="libra"><img src="images/zodiac/vesy.jpg" alt="Весы"></div>
-    <div class="zodiac-icon" data-target="scorpio"><img src="images/zodiac/scorpio.jpg" alt="Скорпион"></div>
-    <div class="zodiac-icon" data-target="sagittarius"><img src="images/zodiac/strelec.jpg" alt="Стрелец"></div>
-    <div class="zodiac-icon" data-target="capricorn"><img src="images/zodiac/kozerog.jpg" alt="Козерог"></div>
-    <div class="zodiac-icon" data-target="aquarius"><img src="images/zodiac/vodoley.jpg" alt="Водолей"></div>
-    <div class="zodiac-icon" data-target="pisces"><img src="images/zodiac/ryby.jpg" alt="Рыбы"></div>
+  <!-- Горизонтальный блок с иконками всех знаков -->
+  <div class="zodiac-icons" id="zodiacIcons">
+    <!-- Иконки будут добавлены через JS -->
   </div>
 
-  <!-- гороскопы по одному -->
-  <div class="zodiac-section" id="aries">
-    <img src="images/zodiac/oven.jpg" alt="Овен" />
-    <h3>Овен</h3>
-    <div class="dates">21 марта — 19 апреля</div>
-    <div class="zodiac-text">Текст гороскопа для Овна... (сюда можно вставить длинный текст)</div>
-    <button class="toggle-btn">Развернуть/Свернуть</button>
+  <!-- Блоки конкретных знаков -->
+  <div id="zodiacCards">
+    <!-- Карточки будут добавлены через JS -->
   </div>
-
-  <div class="zodiac-section" id="taurus">
-    <img src="images/zodiac/telec.jpg" alt="Телец" />
-    <h3>Телец</h3>
-    <div class="dates">20 апреля — 20 мая</div>
-    <div class="zodiac-text">Текст гороскопа для Тельца...</div>
-    <button class="toggle-btn">Развернуть/Свернуть</button>
-  </div>
-
-  <!-- остальные знаки по аналогии -->
-  <div class="zodiac-section" id="gemini">
-    <img src="images/zodiac/bliznecy.jpg" alt="Близнецы" />
-    <h3>Близнецы</h3>
-    <div class="dates">21 мая — 20 июня</div>
-    <div class="zodiac-text">Текст гороскопа для Близнецов...</div>
-    <button class="toggle-btn">Развернуть/Свернуть</button>
-  </div>
-
-  <!-- остальные знаки продолжаем аналогично -->
 </div>
 
 <script>
-  // разворачивание/сворачивание текста
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.addEventListener('click', ()=>{
-      const text = btn.previousElementSibling;
-      text.classList.toggle('expanded');
-    });
-  });
+const zodiacSigns = [
+  {name:'Овен', dates:'21 марта — 19 апреля', img:'images/zodiac/oven.jpg', text:'Гороскоп Овна на 2026...'},
+  {name:'Телец', dates:'20 апреля — 20 мая', img:'images/zodiac/telec.jpg', text:'Гороскоп Тельца на 2026...'},
+  {name:'Близнецы', dates:'21 мая — 20 июня', img:'images/zodiac/bliznecy.jpg', text:'Гороскоп Близнецов на 2026...'},
+  {name:'Рак', dates:'21 июня — 22 июля', img:'images/zodiac/rak.jpg', text:'Гороскоп Рака на 2026...'},
+  {name:'Лев', dates:'23 июля — 22 августа', img:'images/zodiac/lev.jpg', text:'Гороскоп Льва на 2026...'},
+  {name:'Дева', dates:'23 августа — 22 сентября', img:'images/zodiac/deva.jpg', text:'Гороскоп Девы на 2026...'},
+  {name:'Весы', dates:'23 сентября — 22 октября', img:'images/zodiac/vesy.jpg', text:'Гороскоп Весов на 2026...'},
+  {name:'Скорпион', dates:'23 октября — 21 ноября', img:'images/zodiac/scorpio.jpg', text:'Гороскоп Скорпиона на 2026...'},
+  {name:'Стрелец', dates:'22 ноября — 21 декабря', img:'images/zodiac/strelec.jpg', text:'Гороскоп Стрельца на 2026...'},
+  {name:'Козерог', dates:'22 декабря — 19 января', img:'images/zodiac/kozerog.jpg', text:'Гороскоп Козерога на 2026...'},
+  {name:'Водолей', dates:'20 января — 18 февраля', img:'images/zodiac/vodoley.jpg', text:'Гороскоп Водолея на 2026...'},
+  {name:'Рыбы', dates:'19 февраля — 20 марта', img:'images/zodiac/ryby.jpg', text:'Гороскоп Рыб на 2026...'},
+];
 
-  // прокрутка к знаку по клику на иконку
-  document.querySelectorAll('.zodiac-icon').forEach(icon => {
-    icon.addEventListener('click', ()=>{
-      const targetId = icon.dataset.target;
-      const el = document.getElementById(targetId);
-      if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+// Горизонтальный блок с иконками
+const iconsContainer = document.getElementById('zodiacIcons');
+const cardsContainer = document.getElementById('zodiacCards');
+
+zodiacSigns.forEach((sign, index) => {
+  // Иконки
+  const icon = document.createElement('img');
+  icon.src = sign.img;
+  icon.alt = sign.name;
+  icon.addEventListener('click', () => {
+    document.getElementById('card-' + index).scrollIntoView({behavior:'smooth'});
   });
+  iconsContainer.appendChild(icon);
+
+  // Карточки
+  const card = document.createElement('div');
+  card.className = 'zodiac-card';
+  card.id = 'card-' + index;
+  card.innerHTML = `
+    <img src="${sign.img}" alt="${sign.name}">
+    <h3>${sign.name}</h3>
+    <div class="dates">${sign.dates}</div>
+    <p class="horoscope-text hidden">${sign.text}</p>
+    <button class="toggle-text">Развернуть</button>
+  `;
+  cardsContainer.appendChild(card);
+});
+
+// Разворачивание/сворачивание текста
+document.querySelectorAll('.toggle-text').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = btn.previousElementSibling;
+    p.classList.toggle('hidden');
+    btn.textContent = p.classList.contains('hidden') ? 'Развернуть' : 'Свернуть';
+  });
+});
 </script>
-
 </body>
 </html>

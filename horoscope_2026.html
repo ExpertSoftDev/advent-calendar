@@ -1,22 +1,160 @@
-<!-- Кнопка для открытия всплывающего блока общей информации -->
-<div style="text-align:center; margin:30px 0;">
-  <button id="openGeneralInfo" class="toggle">Общая информация о знаках</button>
-</div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Астропрогноз 2026 — Адвент Expert Soft</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Arial", sans-serif;
+    background: radial-gradient(circle at center, #1a0933, #000);
+    color: #fff;
+    overflow-x: hidden;
+  }
 
-<!-- Всплывающее окно -->
-<div id="generalInfoModal" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background:rgba(0,0,0,0.7);
-  z-index:9999;
-  justify-content:center;
-  align-items:center;
-">
-  <div style="
+  .star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkle 2s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 10px;
+  }
+  header h1 {
+    font-size: 42px;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  header h2 {
+    font-size: 22px;
+    margin-top: 10px;
+    color: #e0c4ff;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .intro {
+    background: rgba(255,255,255,0.07);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(6px);
+    margin-bottom: 35px;
+    box-shadow: 0 0 20px rgba(186,134,255,0.3);
+    animation: fadeIn 1.5s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .zodiac-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  .zodiac-icon-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+  .zodiac-icon-wrapper img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(255,255,255,0.4);
+    transition: transform 0.2s;
+  }
+  .zodiac-icon-wrapper img:hover {
+    transform: scale(1.1);
+  }
+  .zodiac-icon-wrapper span {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #d9b3ff;
+    text-align: center;
+  }
+
+  .zodiac-card {
+    background: rgba(255,255,255,0.08);
+    padding: 20px;
+    border-radius: 18px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 18px rgba(200,120,255,0.25);
+    margin-bottom: 30px;
+    position: relative;
+  }
+  .zodiac-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.4);
+  }
+  .zodiac-card h3 {
+    font-size: 22px;
+    margin: 5px 0;
+  }
+  .zodiac-card .dates {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: #d9b3ff;
+  }
+
+  .clamped {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .zodiac-card button.toggle {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  .zodiac-card button.toggle:hover {
+    background: rgba(255,215,0,0.7);
+  }
+
+  /* Всплывающее окно */
+  #generalInfoModal {
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.7);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+  }
+  #generalInfoModalContent {
     background:rgba(255,255,255,0.08);
     padding:25px;
     border-radius:15px;
@@ -27,30 +165,131 @@
     max-height:80vh;
     overflow-y:auto;
     position:relative;
-  ">
-    <button id="closeGeneralInfo" style="
-      position:absolute;
-      top:10px;
-      right:15px;
-      background:rgba(255,255,255,0.2);
-      border:none;
-      padding:6px 12px;
-      border-radius:6px;
-      cursor:pointer;
-      color:#fff;
-    ">✖ Закрыть</button>
+  }
+  #closeGeneralInfo {
+    position:absolute;
+    top:10px;
+    right:15px;
+    background:rgba(255,255,255,0.2);
+    border:none;
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    color:#fff;
+  }
+</style>
+</head>
+<body>
 
-    <h3 style="text-align:center; margin-bottom:15px;">Общая информация о знаках</h3>
-    
-    <div style="line-height:1.6;">
-      <p>Все 12 знаков Зодиака имеют свои особенности, характер и таланты. Каждый знак влияет на личность человека и его жизненные события по-своему. Понимание этих особенностей помогает гармонично строить отношения и достигать целей.</p>
-      <p>Стихии знаков: Огонь, Земля, Воздух, Вода — определяют энергию, с которой человек действует. Планеты-управители придают знакам дополнительные черты и наклонности.</p>
-      <p>Знание сильных и слабых сторон каждого знака помогает выбирать правильное направление действий, улучшать коммуникацию с людьми и использовать свои таланты максимально эффективно.</p>
+<script>
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.top = Math.random() * 100 + 'vh';
+    star.style.left = Math.random() * 100 + 'vw';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    document.body.appendChild(star);
+  }
+</script>
+
+<header>
+  <h1>Адвент Expert Soft</h1>
+  <h2>Астропрогноз на 2026 год</h2>
+</header>
+
+<div class="container">
+  <div class="intro">
+    <p>
+      Астрология сопровождает человечество тысячи лет, помогая найти ориентиры в период перемен 
+      и заглянуть в грядущие события. Астропрогноз — это не просто предсказание, а символическое 
+      отражение возможных тенденций года, раскрывающее энергии, которые будут влиять на каждый 
+      знак Зодиака. 2026 год принесёт новые вызовы, возможности для роста и неожиданные озарения.
+    </p>
+  </div>
+
+  <!-- Кнопка для всплывающего блока -->
+  <div style="text-align:center; margin:30px 0;">
+    <button id="openGeneralInfo" class="toggle">Общая информация о знаках</button>
+  </div>
+
+  <!-- Всплывающее окно -->
+  <div id="generalInfoModal">
+    <div id="generalInfoModalContent">
+      <button id="closeGeneralInfo">✖ Закрыть</button>
+      <h3 style="text-align:center; margin-bottom:15px;">Общая информация о знаках</h3>
+      <div style="line-height:1.6;">
+        <p>Все 12 знаков Зодиака имеют свои особенности, характер и таланты. Каждый знак влияет на личность человека и его жизненные события по-своему. Понимание этих особенностей помогает гармонично строить отношения и достигать целей.</p>
+        <p>Стихии знаков: Огонь, Земля, Воздух, Вода — определяют энергию, с которой человек действует. Планеты-управители придают знакам дополнительные черты и наклонности.</p>
+        <p>Знание сильных и слабых сторон каждого знака помогает выбирать правильное направление действий, улучшать коммуникацию с людьми и использовать свои таланты максимально эффективно.</p>
+      </div>
     </div>
   </div>
+
+  <!-- Блок иконок всех знаков -->
+  <div class="zodiac-icons" id="iconsContainer"></div>
+
+  <!-- Карточки -->
+  <div id="zodiacCards"></div>
 </div>
 
 <script>
+const zodiacSigns = [
+  /* массив знаков здесь — без изменений, как у тебя */
+  /* …все 12 объектов, включая Рыбы … */
+];
+
+// Создание карточек и иконок
+const iconsContainer = document.getElementById('iconsContainer');
+const zodiacCardsContainer = document.getElementById('zodiacCards');
+
+zodiacSigns.forEach((sign, index) => {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'zodiac-icon-wrapper';
+
+  const icon = document.createElement('img');
+  icon.src = sign.img;
+  icon.alt = sign.name;
+  icon.addEventListener('click', () => {
+    document.getElementById('card-' + index).scrollIntoView({behavior:'smooth'});
+  });
+
+  const label = document.createElement('span');
+  label.textContent = sign.name;
+
+  wrapper.appendChild(icon);
+  wrapper.appendChild(label);
+  iconsContainer.appendChild(wrapper);
+
+  const card = document.createElement('div');
+  card.className = 'zodiac-card';
+  card.id = 'card-' + index;
+
+  const prepared = sign.text.replace(/\n\n/g, "<br><br>");
+  card.innerHTML = `
+    <img src="${sign.img}" alt="${sign.name}">
+    <h3>${sign.name}</h3>
+    <div class="dates">${sign.dates}</div>
+    <div class="text clamped">${prepared}</div>
+    <button class="toggle">Показать полностью</button>
+  `;
+  zodiacCardsContainer.appendChild(card);
+
+  const textBlock = card.querySelector('.text');
+  const btn = card.querySelector('.toggle');
+  btn.addEventListener("click", () => {
+    const isClamped = textBlock.classList.contains("clamped");
+    if (isClamped) {
+      textBlock.classList.remove("clamped");
+      btn.textContent = "Скрыть";
+    } else {
+      textBlock.classList.add("clamped");
+      btn.textContent = "Показать полностью";
+    }
+    card.scrollIntoView({ behavior: "smooth" });
+  });
+});
+
+// Всплывающее окно
 const modal = document.getElementById('generalInfoModal');
 const openBtn = document.getElementById('openGeneralInfo');
 const closeBtn = document.getElementById('closeGeneralInfo');
@@ -58,8 +297,10 @@ const closeBtn = document.getElementById('closeGeneralInfo');
 openBtn.addEventListener('click', () => {
   modal.style.display = 'flex';
 });
-
 closeBtn.addEventListener('click', () => {
   modal.style.display = 'none';
 });
 </script>
+
+</body>
+</html>

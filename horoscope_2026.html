@@ -125,15 +125,19 @@
     margin-bottom: 12px;
     color: #d9b3ff;
   }
-.zodiac-card p {
+.zodiac-card .text {
   text-align: left;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;      /* ← сколько строк видно */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
-.zodiac-card p.expanded {
-  -webkit-line-clamp: unset;  /* ← показываем весь текст */
+
+.zodiac-card .text.expanded {
+  -webkit-line-clamp: unset;
+}
+  .zodiac-card p {
+  margin: 0 0 12px;
 }
   .zodiac-card button.toggle {
     margin-top: 10px;
@@ -227,18 +231,23 @@ zodiacSigns.forEach((sign, index) => {
   const card = document.createElement('div');
   card.className = 'zodiac-card';
   card.id = 'card-' + index;
-  card.innerHTML = `
-    <img src="${sign.img}" alt="${sign.name}">
-    <h3>${sign.name}</h3>
-    <div class="dates">${sign.dates}</div>
-    <p>${sign.text}</p>
-    <button class="toggle">Показать/Скрыть текст</button>
-  `;
+card.innerHTML = `
+  <img src="${sign.img}" alt="${sign.name}">
+  <h3>${sign.name}</h3>
+  <div class="dates">${sign.dates}</div>
+  <div class="text">
+    ${sign.text
+      .split('\n\n')
+      .map(paragraph => `<p>${paragraph}</p>`)
+      .join('')}
+  </div>
+  <button class="toggle">Показать/Скрыть текст</button>
+`;
   zodiacCardsContainer.appendChild(card);
 
   // Разворачивание/сворачивание текста
   const btn = card.querySelector('.toggle');
-  const p = card.querySelector('p');
+  const p = card.querySelector('.text');
 btn.addEventListener('click', () => {
   p.classList.toggle('expanded');
   card.scrollIntoView({behavior:'smooth'});

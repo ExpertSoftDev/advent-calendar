@@ -125,10 +125,16 @@
     margin-bottom: 12px;
     color: #d9b3ff;
   }
-  .zodiac-card p {
-    display: none; /* по умолчанию текст свернут */
-    text-align: left;
-  }
+.zodiac-card p {
+  text-align: left;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;      /* ← сколько строк видно */
+  -webkit-box-orient: vertical;
+}
+.zodiac-card p.expanded {
+  -webkit-line-clamp: unset;  /* ← показываем весь текст */
+}
   .zodiac-card button.toggle {
     margin-top: 10px;
     padding: 6px 12px;
@@ -233,10 +239,10 @@ zodiacSigns.forEach((sign, index) => {
   // Разворачивание/сворачивание текста
   const btn = card.querySelector('.toggle');
   const p = card.querySelector('p');
-  btn.addEventListener('click', () => {
-    p.style.display = p.style.display === 'block' ? 'none' : 'block';
-    card.scrollIntoView({behavior:'smooth'});
-  });
+btn.addEventListener('click', () => {
+  p.classList.toggle('expanded');
+  card.scrollIntoView({behavior:'smooth'});
+});
 });
 </script>
 

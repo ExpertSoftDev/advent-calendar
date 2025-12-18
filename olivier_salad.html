@@ -10,7 +10,6 @@
     margin: 0;
     overflow: hidden;
     font-family: Arial, sans-serif;
-    color: #fff;
     background: url("images/background.png") center / cover no-repeat fixed;
   }
 
@@ -19,58 +18,96 @@
     top: 10px;
     width: 100%;
     text-align: center;
+    color: #fff;
     z-index: 20;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    text-shadow: 0 2px 8px rgba(0,0,0,.6);
   }
 
-  #plate {
+  /* ===== ПРОГРЕСС ===== */
+  #progress {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+  }
+
+  #progress img {
+    width: 42px;
+    height: 42px;
+    opacity: .3;
+    filter: grayscale(1);
+    transition: .3s;
+  }
+
+  #progress img.active {
+    opacity: 1;
+    filter: none;
+  }
+
+  /* ===== ТАРЕЛКА ===== */
+  #plate-wrapper {
     position: fixed;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 33vw;
-    max-width: 420px;
-    min-width: 260px;
+    width: 34vw;
+    max-width: 440px;
+    min-width: 280px;
     z-index: 10;
     pointer-events: none;
   }
 
+  #plate {
+    width: 100%;
+    display: block;
+  }
+
+  #plate-content {
+    position: absolute;
+    inset: 20% 15% 20% 15%;
+  }
+
+  #plate-content img {
+    position: absolute;
+    width: 70px;
+    transition: .4s ease;
+  }
+
+  /* ===== ИНГРЕДИЕНТЫ ===== */
   .ingredient {
     position: fixed;
     cursor: pointer;
-    user-select: none;
     z-index: 5;
   }
 
-  .needed {
-    width: 110px;
-    height: 110px;
-  }
+  .needed { width: 110px; }
+  .wrong { width: 90px; }
 
-  .wrong {
-    width: 90px;
-    height: 90px;
-  }
-
+  /* ===== ОШИБКА ===== */
   #error {
     position: fixed;
     inset: 0;
-    background: rgba(255,0,0,0.55);
+    background: rgba(255,0,0,.55);
     display: none;
     align-items: center;
     justify-content: center;
-    font-size: 96px;
+    font-size: 90px;
     z-index: 30;
   }
 
+  /* ===== ПОБЕДА ===== */
   #win {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,.7);
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #fff;
     font-size: 42px;
     z-index: 40;
   }
@@ -79,8 +116,8 @@
     margin-top: 20px;
     padding: 12px 24px;
     font-size: 18px;
-    border: none;
     border-radius: 8px;
+    border: none;
     cursor: pointer;
   }
 
@@ -95,9 +132,15 @@
 
 <body>
 
-<h1>🥗 Поймай Оливье 🥗</h1>
+<h1>🥗 Поймай Оливье</h1>
 
-<img id="plate" src="images/plate.png">
+<div id="progress"></div>
+
+<div id="plate-wrapper">
+  <img id="plate" src="images/plate.png">
+  <div id="plate-content"></div>
+</div>
+
 <div id="error">❌</div>
 
 <div id="win">
@@ -109,22 +152,28 @@
 
 <script>
 const neededNames = ['potato','carrot','egg','pickle','peas','sausage','mayo'];
-
 const needed = neededNames.map(n => ({name:n, img:`images/${n}.png`, needed:true}));
-const wrong = [
-  'banana','apple','fish','cheese','donut','chili','cake'
-].map(n => ({name:n, img:`images/${n}.png`, needed:false}));
+const wrong = ['banana','apple','fish','cheese','donut','chili','cake']
+  .map(n => ({name:n, img:`images/${n}.png`, needed:false}));
 
 let collected = new Set();
 let gameActive = true;
 let spawnInterval;
 
-/* ===== ВСПОМОГАТЕЛЬНОЕ ===== */
+/* ===== ПРОГРЕСС ===== */
+const progress = document.getElementById('progress');
+needed.forEach(i => {
+  const img = document.createElement('img');
+  img.src = i.img;
+  img.id = 'p-' + i.name;
+  progress.appendChild(img);
+});
 
+/* ===== ВСПОМОГАТЕЛЬНОЕ ===== */
 function intersects(a, b) {
   const ar = a.getBoundingClientRect();
   const br = b.getBoundingClientRect();
-  return !(ar.right < br.left || ar.left > br.right || ar.bottom < br.top || ar.top > br.bottom);
+  return !(ar.bottom < br.top || ar.top > br.bottom || ar.right < br.left || ar.left > br.right);
 }
 
 function showError() {
@@ -134,42 +183,42 @@ function showError() {
 }
 
 /* ===== КОНФЕТТИ ===== */
-
 const canvas = document.getElementById('confetti');
 const ctx = canvas.getContext('2d');
 let confetti = [];
+let confettiActive = false;
 
 function startConfetti() {
+  confettiActive = true;
   canvas.width = innerWidth;
   canvas.height = innerHeight;
 
   confetti = Array.from({length: 250}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 6 + 4,
-    dx: Math.random() * 4 - 2,
-    dy: Math.random() * 5 + 2,
-    color: `hsl(${Math.random()*360},100%,50%)`
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*6+4,
+    dx: Math.random()*4-2,
+    dy: Math.random()*5+2,
+    c: `hsl(${Math.random()*360},100%,50%)`
   }));
 
   function animate() {
+    if (!confettiActive) return;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     confetti.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
+      p.x += p.dx; p.y += p.dy;
       if (p.y > canvas.height) p.y = -10;
-      ctx.fillStyle = p.color;
+      ctx.fillStyle = p.c;
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fill();
     });
-    if (!gameActive) requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
   }
   animate();
 }
 
 /* ===== ПОБЕДА ===== */
-
 function checkWin() {
   if (collected.size === neededNames.length) {
     gameActive = false;
@@ -179,80 +228,84 @@ function checkWin() {
   }
 }
 
-/* ===== СОЗДАНИЕ ИНГРЕДИЕНТА ===== */
-
+/* ===== ИНГРЕДИЕНТ ===== */
 function createIngredient() {
   if (!gameActive) return;
 
   const isNeeded = Math.random() < 0.65;
-  const source = isNeeded ? needed : wrong;
-  const data = source[Math.floor(Math.random() * source.length)];
+  const data = (isNeeded ? needed : wrong)[Math.floor(Math.random()*7)];
 
   const el = document.createElement('img');
   el.src = data.img;
-  el.className = `ingredient ${data.needed ? 'needed' : 'wrong'}`;
-  el.dataset.name = data.name;
+  el.className = `ingredient ${data.needed ? 'needed':'wrong'}`;
   document.body.appendChild(el);
 
-  const fromLeft = Math.random() > 0.5;
-  let x = fromLeft ? -120 : innerWidth + 120;
-  const endX = fromLeft ? innerWidth + 120 : -120;
-  const y = 120 + Math.random() * innerHeight * 0.4;
+  const fromLeft = Math.random() > .5;
+  let x = fromLeft ? -140 : innerWidth + 140;
+  const endX = fromLeft ? innerWidth + 140 : -140;
+  const y = 140 + Math.random() * (innerHeight * .35);
 
-  el.style.left = x + 'px';
-  el.style.top = y + 'px';
+  el.style.left = x+'px';
+  el.style.top = y+'px';
 
-  const speed = 2 + Math.random() * 2;
-  const fly = setInterval(() => {
+  const speed = 2 + Math.random()*2;
+  const fly = setInterval(()=>{
     x += fromLeft ? speed : -speed;
-    el.style.left = x + 'px';
-    if ((fromLeft && x > endX) || (!fromLeft && x < endX)) {
+    el.style.left = x+'px';
+    if ((fromLeft && x>endX)||(!fromLeft&&x<endX)) {
       clearInterval(fly);
       el.remove();
     }
-  }, 16);
+  },16);
 
-  el.onclick = () => {
+  el.onclick = ()=>{
     clearInterval(fly);
-    let yPos = el.getBoundingClientRect().top;
+    let top = el.getBoundingClientRect().top;
     const plate = document.getElementById('plate');
 
-    const fall = setInterval(() => {
-      yPos += 8;
-      el.style.top = yPos + 'px';
+    const fall = setInterval(()=>{
+      top += 8;
+      el.style.top = top+'px';
 
       if (intersects(el, plate)) {
         clearInterval(fall);
-        el.remove();
         if (data.needed) {
           collected.add(data.name);
+          document.getElementById('p-'+data.name).classList.add('active');
+
+          const clone = el.cloneNode();
+          clone.style.position = 'absolute';
+          clone.style.left = Math.random()*60+'%';
+          clone.style.top = Math.random()*60+'%';
+          document.getElementById('plate-content').appendChild(clone);
+
+          el.remove();
           checkWin();
         } else {
+          el.remove();
           showError();
         }
       }
-
-      if (yPos > innerHeight) {
-        clearInterval(fall);
-        el.remove();
-        showError();
-      }
-    }, 16);
+    },16);
   };
 }
 
-/* ===== ПЕРЕЗАПУСК ===== */
-
+/* ===== РЕСТАРТ ===== */
 function restartGame() {
   collected.clear();
   gameActive = true;
   document.getElementById('win').style.display = 'none';
+
+  confettiActive = false;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  document.querySelectorAll('.ingredient').forEach(i => i.remove());
+  confetti = [];
+
+  document.querySelectorAll('.ingredient').forEach(i=>i.remove());
+  document.querySelectorAll('#plate-content img').forEach(i=>i.remove());
+  document.querySelectorAll('#progress img').forEach(i=>i.classList.remove('active'));
+
   spawnInterval = setInterval(createIngredient, 450);
 }
-
-/* ===== СТАРТ ===== */
 
 spawnInterval = setInterval(createIngredient, 450);
 </script>

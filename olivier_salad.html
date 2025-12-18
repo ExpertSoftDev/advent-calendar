@@ -26,17 +26,17 @@
   /* ===== ПРОГРЕСС ===== */
   #progress {
     position: fixed;
-    top: 60px;
+    top: 90px; /* опустили ниже */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 10px;
+    gap: 14px;
     z-index: 20;
   }
 
   #progress img {
-    width: 42px;
-    height: 42px;
+    width: 52px; /* увеличили */
+    height: 52px;
     opacity: .3;
     filter: grayscale(1);
     transition: .3s;
@@ -54,8 +54,8 @@
     left: 50%;
     transform: translateX(-50%);
     width: 34vw;
-    max-width: 440px;
-    min-width: 280px;
+    max-width: 460px;
+    min-width: 300px;
     z-index: 10;
     pointer-events: none;
   }
@@ -67,13 +67,14 @@
 
   #plate-content {
     position: absolute;
-    inset: 20% 15% 20% 15%;
+    inset: 18% 14% 20% 14%;
   }
 
   #plate-content img {
     position: absolute;
-    width: 70px;
-    transition: .4s ease;
+    width: 110px; /* ингредиенты в тарелке крупнее */
+    transition: transform .4s ease, opacity .4s ease;
+    transform: scale(1.15);
   }
 
   /* ===== ИНГРЕДИЕНТЫ ===== */
@@ -83,8 +84,8 @@
     z-index: 5;
   }
 
-  .needed { width: 110px; }
-  .wrong { width: 90px; }
+  .needed { width: 120px; }
+  .wrong { width: 95px; }
 
   /* ===== ОШИБКА ===== */
   #error {
@@ -193,7 +194,7 @@ function startConfetti() {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
 
-  confetti = Array.from({length: 250}, () => ({
+  confetti = Array.from({length: 260}, () => ({
     x: Math.random()*canvas.width,
     y: Math.random()*canvas.height,
     r: Math.random()*6+4,
@@ -241,9 +242,11 @@ function createIngredient() {
   document.body.appendChild(el);
 
   const fromLeft = Math.random() > .5;
-  let x = fromLeft ? -140 : innerWidth + 140;
-  const endX = fromLeft ? innerWidth + 140 : -140;
-  const y = 140 + Math.random() * (innerHeight * .35);
+  let x = fromLeft ? -160 : innerWidth + 160;
+  const endX = fromLeft ? innerWidth + 160 : -160;
+
+  /* ⬆️ поток ещё выше */
+  const y = 110 + Math.random() * (innerHeight * 0.28);
 
   el.style.left = x+'px';
   el.style.top = y+'px';
@@ -275,8 +278,9 @@ function createIngredient() {
 
           const clone = el.cloneNode();
           clone.style.position = 'absolute';
-          clone.style.left = Math.random()*60+'%';
-          clone.style.top = Math.random()*60+'%';
+          clone.style.left = Math.random()*55+'%';
+          clone.style.top = Math.random()*55+'%';
+          clone.style.transform = 'scale(1.2)';
           document.getElementById('plate-content').appendChild(clone);
 
           el.remove();
@@ -304,10 +308,10 @@ function restartGame() {
   document.querySelectorAll('#plate-content img').forEach(i=>i.remove());
   document.querySelectorAll('#progress img').forEach(i=>i.classList.remove('active'));
 
-  spawnInterval = setInterval(createIngredient, 450);
+  spawnInterval = setInterval(createIngredient, 420);
 }
 
-spawnInterval = setInterval(createIngredient, 450);
+spawnInterval = setInterval(createIngredient, 420);
 </script>
 
 </body>

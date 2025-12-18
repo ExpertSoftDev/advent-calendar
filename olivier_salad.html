@@ -26,7 +26,7 @@
   /* ===== ПРОГРЕСС ===== */
   #progress {
     position: fixed;
-    top: 90px; /* опустили ниже */
+    top: 100px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -35,7 +35,7 @@
   }
 
   #progress img {
-    width: 52px; /* увеличили */
+    width: 52px;
     height: 52px;
     opacity: .3;
     filter: grayscale(1);
@@ -50,12 +50,12 @@
   /* ===== ТАРЕЛКА ===== */
   #plate-wrapper {
     position: fixed;
-    bottom: 0;
+    bottom: -20px; /* ⬇️ опустили */
     left: 50%;
     transform: translateX(-50%);
-    width: 34vw;
-    max-width: 460px;
-    min-width: 300px;
+    width: 36vw;
+    max-width: 480px;
+    min-width: 320px;
     z-index: 10;
     pointer-events: none;
   }
@@ -67,13 +67,13 @@
 
   #plate-content {
     position: absolute;
-    inset: 18% 14% 20% 14%;
+    inset: 20% 14% 22% 14%;
   }
 
   #plate-content img {
     position: absolute;
-    width: 110px; /* ингредиенты в тарелке крупнее */
-    transition: transform .4s ease, opacity .4s ease;
+    width: 110px;
+    transition: transform .45s ease, opacity .45s ease;
     transform: scale(1.15);
   }
 
@@ -82,6 +82,11 @@
     position: fixed;
     cursor: pointer;
     z-index: 5;
+    transition: transform .2s;
+  }
+
+  .ingredient:hover {
+    transform: scale(1.05);
   }
 
   .needed { width: 120px; }
@@ -170,17 +175,20 @@ needed.forEach(i => {
   progress.appendChild(img);
 });
 
-/* ===== ВСПОМОГАТЕЛЬНОЕ ===== */
-function intersects(a, b) {
-  const ar = a.getBoundingClientRect();
-  const br = b.getBoundingClientRect();
-  return !(ar.bottom < br.top || ar.top > br.bottom || ar.right < br.left || ar.left > br.right);
-}
-
 function showError() {
   const e = document.getElementById('error');
   e.style.display = 'flex';
   setTimeout(() => e.style.display = 'none', 300);
+}
+
+/* ===== ПОБЕДА ===== */
+function checkWin() {
+  if (collected.size === neededNames.length) {
+    gameActive = false;
+    clearInterval(spawnInterval);
+    document.getElementById('win').style.display = 'flex';
+    startConfetti();
+  }
 }
 
 /* ===== КОНФЕТТИ ===== */
@@ -203,30 +211,19 @@ function startConfetti() {
     c: `hsl(${Math.random()*360},100%,50%)`
   }));
 
-  function animate() {
+  (function animate(){
     if (!confettiActive) return;
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    confetti.forEach(p => {
-      p.x += p.dx; p.y += p.dy;
-      if (p.y > canvas.height) p.y = -10;
-      ctx.fillStyle = p.c;
+    confetti.forEach(p=>{
+      p.x+=p.dx; p.y+=p.dy;
+      if(p.y>canvas.height) p.y=-10;
+      ctx.fillStyle=p.c;
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fill();
     });
     requestAnimationFrame(animate);
-  }
-  animate();
-}
-
-/* ===== ПОБЕДА ===== */
-function checkWin() {
-  if (collected.size === neededNames.length) {
-    gameActive = false;
-    clearInterval(spawnInterval);
-    document.getElementById('win').style.display = 'flex';
-    startConfetti();
-  }
+  })();
 }
 
 /* ===== ИНГРЕДИЕНТ ===== */
@@ -238,15 +235,15 @@ function createIngredient() {
 
   const el = document.createElement('img');
   el.src = data.img;
-  el.className = `ingredient ${data.needed ? 'needed':'wrong'}`;
+  el.className = `ingredient ${data.needed?'needed':'wrong'}`;
   document.body.appendChild(el);
 
   const fromLeft = Math.random() > .5;
   let x = fromLeft ? -160 : innerWidth + 160;
   const endX = fromLeft ? innerWidth + 160 : -160;
 
-  /* ⬆️ поток ещё выше */
-  const y = 110 + Math.random() * (innerHeight * 0.28);
+  /* ⬇️ поток ниже */
+  const y = 180 + Math.random() * (innerHeight * 0.32);
 
   el.style.left = x+'px';
   el.style.top = y+'px';
@@ -263,15 +260,21 @@ function createIngredient() {
 
   el.onclick = ()=>{
     clearInterval(fly);
+
     let top = el.getBoundingClientRect().top;
     const plate = document.getElementById('plate');
+    const plateTop = plate.getBoundingClientRect().top + 20;
 
     const fall = setInterval(()=>{
       top += 8;
       el.style.top = top+'px';
 
-      if (intersects(el, plate)) {
+      /* 💡 проверяем центр ингредиента */
+      const center = top + el.offsetHeight / 2;
+
+      if (center >= plateTop) {
         clearInterval(fall);
+
         if (data.needed) {
           collected.add(data.name);
           document.getElementById('p-'+data.name).classList.add('active');
@@ -280,8 +283,13 @@ function createIngredient() {
           clone.style.position = 'absolute';
           clone.style.left = Math.random()*55+'%';
           clone.style.top = Math.random()*55+'%';
-          clone.style.transform = 'scale(1.2)';
+          clone.style.opacity = 0;
           document.getElementById('plate-content').appendChild(clone);
+
+          requestAnimationFrame(()=>{
+            clone.style.opacity = 1;
+            clone.style.transform = 'scale(1.2)';
+          });
 
           el.remove();
           checkWin();
@@ -302,7 +310,6 @@ function restartGame() {
 
   confettiActive = false;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  confetti = [];
 
   document.querySelectorAll('.ingredient').forEach(i=>i.remove());
   document.querySelectorAll('#plate-content img').forEach(i=>i.remove());

@@ -2,344 +2,279 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Поймай Оливье</title>
-
+<title>Игра оливье</title>
 <style>
   body {
     margin: 0;
     overflow: hidden;
-    font-family: Arial, sans-serif;
-    background: url("images/background.png") center / cover no-repeat fixed;
+    font-family: sans-serif;
   }
-
-  h1 {
-    position: fixed;
-    top: 10px;
-    width: 100%;
-    text-align: center;
-    color: #fff;
-    z-index: 20;
-    text-shadow: 0 2px 8px rgba(0,0,0,.6);
-  }
-
-  /* ===== ПРОГРЕСС ===== */
-  #progress {
-    position: fixed;
-    top: 130px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 16px;
-    z-index: 20;
-  }
-
-  #progress img {
-    width: 60px;
-    height: 60px;
-    opacity: .3;
-    filter: grayscale(1);
-    transition: .3s;
-  }
-
-  #progress img.active {
-    opacity: 1;
-    filter: none;
-  }
-
-  /* ===== ТАРЕЛКА ===== */
-  #plate-wrapper {
-    position: fixed;
-    bottom: -140px; /* ⬇️ ещё ниже */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40vw;
-    max-width: 560px;
-    min-width: 360px;
-    z-index: 15;
-    pointer-events: none;
-  }
-
-  #plate {
-    width: 100%;
-    display: block;
-  }
-
-  #plate-content {
-    position: absolute;
-    inset: 24% 16% 26% 16%;
-  }
-
-  #plate-content img {
-    position: absolute;
-    width: 120px;
-    transform: scale(1.2);
-    transition: transform .45s ease, opacity .45s ease;
-  }
-
-  /* ===== ИНГРЕДИЕНТЫ ===== */
-  .ingredient {
-    position: fixed;
-    cursor: pointer;
-    z-index: 5;
-  }
-
-  .needed { width: 135px; }
-  .wrong  { width: 100px; }
-
-  /* ===== ОШИБКА ===== */
-  #error {
-    position: fixed;
-    inset: 0;
-    background: rgba(255,0,0,.55);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 90px;
-    z-index: 30;
-  }
-
-  /* ===== ПОБЕДА ===== */
-  #win {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.7);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 42px;
-    z-index: 40;
-  }
-
-  #win button {
-    margin-top: 20px;
-    padding: 12px 26px;
-    font-size: 18px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-  }
-
   canvas {
+    display: block;
+    background: url('images/фон.png') no-repeat center center;
+    background-size: cover;
+  }
+
+  #rules {
     position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 35;
+    top: 20px;
+    right: 20px;
+    width: 220px;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    z-index: 10;
+  }
+
+  #rules h4 { margin: 0 0 6px; font-size: 15px; }
+  #rules ul { margin: 0; padding-left: 16px; }
+
+  #restartBtn {
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 12px 20px;
+    font-size: 16px;
+    background: #ffcc00;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: none;
+    z-index: 20;
+  }
+
+  #progressContainer {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 24px;
+    background: #ddd;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: #4caf50;
+    border-radius: 12px;
+    transition: width 0.3s;
   }
 </style>
 </head>
-
 <body>
 
-<h1>🥗 Поймай Оливье</h1>
-
-<div id="progress"></div>
-
-<div id="plate-wrapper">
-  <img id="plate" src="images/plate.png">
-  <div id="plate-content"></div>
+<div id="rules">
+  <h4>Как играть 🍽️</h4>
+  <ul>
+    <li>Собери салат оливье</li>
+    <li>Кликай только по нужным продуктам</li>
+    <li>Продукт засчитывается, если он над тарелкой</li>
+    <li>Лишние ингредиенты — ошибка</li>
+  </ul>
 </div>
 
-<div id="error">❌</div>
-
-<div id="win">
-  🎉 ОЛИВЬЕ ГОТОВ!
-  <button onclick="restartGame()">Сыграть ещё раз</button>
+<div id="progressContainer">
+  <div id="progressBar"></div>
 </div>
 
-<canvas id="confetti"></canvas>
+<button id="restartBtn">Играть заново</button>
 
-<!-- ЗВУКИ -->
 <audio id="soundPluh" src="sounds/pluh.mp3"></audio>
 <audio id="soundWin" src="sounds/win.mp3"></audio>
+<audio id="soundWrong" src="sounds/wrong.mp3"></audio>
 
+<canvas id="gameCanvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-const neededNames = ['potato','carrot','egg','pickle','peas','sausage','mayo'];
-const needed = neededNames.map(n => ({name:n, img:`images/${n}.png`, needed:true}));
-const wrong = ['banana','apple','fish','cheese','donut','chili','cake']
-  .map(n => ({name:n, img:`images/${n}.png`, needed:false}));
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-let collected = new Set();
-let gameActive = true;
-let spawnInterval;
+const soundPluh = document.getElementById('soundPluh');
+const soundWin = document.getElementById('soundWin');
+const soundWrong = document.getElementById('soundWrong');
 
-/* ===== ЗВУКИ ===== */
-const pluhSound = document.getElementById('soundPluh');
-pluhSound.volume = 0.25;
+const restartBtn = document.getElementById('restartBtn');
+const progressBar = document.getElementById('progressBar');
 
-const winSound = document.getElementById('soundWin');
-winSound.volume = 0.3;
+const plateImg = new Image();
+plateImg.src = 'images/тарелка.png';
 
-/* ===== ПРОГРЕСС ===== */
-const progress = document.getElementById('progress');
-needed.forEach(i => {
-  const img = document.createElement('img');
-  img.src = i.img;
-  img.id = 'p-' + i.name;
-  progress.appendChild(img);
-});
+const productList = [
+  {name:'картошка', src:'images/картошка.png', needed:true},
+  {name:'морковка', src:'images/морковка.png', needed:true},
+  {name:'яйца', src:'images/яйца.png', needed:true},
+  {name:'огурцы', src:'images/огурцы.png', needed:true},
+  {name:'горошек', src:'images/горошек.png', needed:true},
+  {name:'колбаса', src:'images/колбаса.png', needed:true},
+  {name:'майонез', src:'images/майонез.png', needed:true},
+  // лишние продукты
+  {name:'лук', src:'images/лук.png', needed:false},
+  {name:'помидор', src:'images/помидор.png', needed:false},
+  {name:'яблоко', src:'images/яблоко.png', needed:false},
+];
 
-function showError() {
-  const e = document.getElementById('error');
-  e.style.display = 'flex';
-  setTimeout(() => e.style.display = 'none', 300);
+let products = [];
+let collected = [];
+let plate = {x:canvas.width/2, y:canvas.height*0.75, width:300, height:200};
+let gameOver = false;
+
+function resetGame() {
+  products = [];
+  collected = [];
+  gameOver = false;
+  restartBtn.style.display = 'none';
+  progressBar.style.width = '0%';
+  initProducts();
 }
 
-/* ===== ПРОВЕРКА НАД ТАРЕЛКОЙ ===== */
-function isOverPlate(el) {
-  const plateRect = document.getElementById('plate').getBoundingClientRect();
-  const elRect = el.getBoundingClientRect();
-  const centerX = elRect.left + elRect.width / 2;
-  return centerX > plateRect.left && centerX < plateRect.right;
+function initProducts() {
+  const total = 20;
+  const neededCount = Math.floor(total * 0.65);
+  const allProducts = [];
+
+  const neededProducts = productList.filter(p=>p.needed);
+  const extraProducts = productList.filter(p=>!p.needed);
+
+  for(let i=0;i<neededCount;i++){
+    const p = neededProducts[Math.floor(Math.random()*neededProducts.length)];
+    allProducts.push({...p, x:Math.random()*canvas.width, y:Math.random()*canvas.height*0.1, size:60, speed:1+Math.random()*2});
+  }
+  for(let i=neededCount;i<total;i++){
+    const p = extraProducts[Math.floor(Math.random()*extraProducts.length)];
+    allProducts.push({...p, x:Math.random()*canvas.width, y:Math.random()*canvas.height*0.1, size:60, speed:1+Math.random()*2});
+  }
+  products = allProducts;
 }
 
-/* ===== ПОБЕДА ===== */
-function checkWin() {
-  if (collected.size === neededNames.length) {
-    gameActive = false;
-    clearInterval(spawnInterval);
-    document.getElementById('win').style.display = 'flex';
-    winSound.currentTime = 0;
-    winSound.play();
-    startConfetti();
+function drawPlate() {
+  ctx.drawImage(plateImg, plate.x - plate.width/2, plate.y - plate.height/2, plate.width, plate.height);
+}
+
+function drawProducts() {
+  products.forEach(p=>{
+    if(!p.collected){
+      ctx.drawImage(p.img, p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+    }
+  });
+}
+
+function updateProducts() {
+  products.forEach(p=>{
+    if(!p.collected){
+      p.x += (p.dx || 1) || 0;
+      if(!p.dx) p.dx = Math.random()<0.5?1:-1;
+    }
+  });
+}
+
+function checkClick(e){
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  for(let p of products){
+    if(!p.collected){
+      const left = p.x - p.size/2;
+      const right = p.x + p.size/2;
+      const top = p.y - p.size/2;
+      const bottom = p.y + p.size/2;
+
+      if(mouseX>=left && mouseX<=right && mouseY>=top && mouseY<=bottom){
+        // проверяем, над тарелкой
+        if(p.needed && mouseY < plate.y && mouseY > plate.y - plate.height){
+          p.collected = true;
+          // плавное падение в тарелку
+          animateToPlate(p);
+          soundPluh.currentTime = 0;
+          soundPluh.play();
+          updateProgress();
+        } else {
+          soundWrong.currentTime = 0;
+          soundWrong.play();
+        }
+      }
+    }
   }
 }
 
-/* ===== КОНФЕТТИ ===== */
-const canvas = document.getElementById('confetti');
-const ctx = canvas.getContext('2d');
-let confetti = [];
-let confettiActive = false;
+function animateToPlate(product){
+  const targetY = plate.y;
+  const duration = 500;
+  const startY = product.y;
+  const startTime = performance.now();
 
-function startConfetti() {
-  confettiActive = true;
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-
-  confetti = Array.from({length: 260}, () => ({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    r: Math.random()*6+4,
-    dx: Math.random()*4-2,
-    dy: Math.random()*5+2,
-    c: `hsl(${Math.random()*360},100%,50%)`
-  }));
-
-  (function animate(){
-    if (!confettiActive) return;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    confetti.forEach(p=>{
-      p.x+=p.dx; p.y+=p.dy;
-      if(p.y>canvas.height) p.y=-10;
-      ctx.fillStyle=p.c;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
-    });
-    requestAnimationFrame(animate);
-  })();
-}
-
-/* ===== ИНГРЕДИЕНТЫ ===== */
-function createIngredient() {
-  if (!gameActive) return;
-
-  const isNeeded = Math.random() < 0.65;
-  const data = (isNeeded ? needed : wrong)[Math.floor(Math.random()*7)];
-
-  const el = document.createElement('img');
-  el.src = data.img;
-  el.className = `ingredient ${data.needed?'needed':'wrong'}`;
-  document.body.appendChild(el);
-
-  const fromLeft = Math.random() > .5;
-  let x = fromLeft ? -180 : innerWidth + 180;
-  const endX = fromLeft ? innerWidth + 180 : -180;
-
-  /* ⬇️ ЖЁСТКО выше тарелки */
-  const yMin = 260;
-  const yMax = innerHeight * 0.45;
-  const y = yMin + Math.random() * (yMax - yMin);
-
-  el.style.left = x+'px';
-  el.style.top = y+'px';
-
-  const speed = 2 + Math.random()*2;
-  const fly = setInterval(()=>{
-    x += fromLeft ? speed : -speed;
-    el.style.left = x+'px';
-    if ((fromLeft && x>endX)||(!fromLeft&&x<endX)) {
-      clearInterval(fly);
-      el.remove();
+  function animate(time){
+    const elapsed = time - startTime;
+    const t = Math.min(1, elapsed/duration);
+    product.y = startY + t*(targetY - startY);
+    product.size = 60 + t*(plate.height*0.3 - 60);
+    if(t<1){
+      requestAnimationFrame(animate);
+    } else {
+      checkWin();
     }
-  },16);
-
-  el.onclick = ()=>{
-    clearInterval(fly);
-
-    let top = el.getBoundingClientRect().top;
-    const plateTop = document.getElementById('plate').getBoundingClientRect().top + 30;
-
-    const fall = setInterval(()=>{
-      top += 8;
-      el.style.top = top+'px';
-
-      const rect = el.getBoundingClientRect();
-      const centerY = rect.top + rect.height / 2;
-
-      if (centerY >= plateTop) {
-        clearInterval(fall);
-
-        if (data.needed && isOverPlate(el)) {
-          pluhSound.currentTime = 0;
-          pluhSound.play();
-
-          collected.add(data.name);
-          document.getElementById('p-'+data.name).classList.add('active');
-
-          const clone = el.cloneNode();
-          clone.style.position = 'absolute';
-          clone.style.left = Math.random()*55+'%';
-          clone.style.top = Math.random()*55+'%';
-          clone.style.opacity = 0;
-          document.getElementById('plate-content').appendChild(clone);
-
-          requestAnimationFrame(()=>{
-            clone.style.opacity = 1;
-            clone.style.transform = 'scale(1.25)';
-          });
-
-          el.remove();
-          checkWin();
-        } else {
-          el.remove();
-          showError();
-        }
-      }
-    },16);
-  };
+  }
+  requestAnimationFrame(animate);
 }
 
-/* ===== РЕСТАРТ ===== */
-function restartGame() {
-  collected.clear();
-  gameActive = true;
-  document.getElementById('win').style.display = 'none';
+function updateProgress(){
+  const neededTotal = productList.filter(p=>p.needed).length;
+  const collectedCount = products.filter(p=>p.collected && p.needed).length;
+  const percent = Math.round((collectedCount/neededTotal)*100);
+  progressBar.style.width = percent+'%';
+}
 
-  confettiActive = false;
+function checkWin(){
+  const neededTotal = productList.filter(p=>p.needed).length;
+  const collectedCount = products.filter(p=>p.collected && p.needed).length;
+  if(collectedCount >= neededTotal){
+    gameOver = true;
+    soundWin.currentTime = 0;
+    soundWin.play();
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    restartBtn.style.display = 'block';
+  }
+}
+
+function loadImages(){
+  products.forEach(p=>{
+    const img = new Image();
+    img.src = p.src;
+    p.img = img;
+  });
+}
+
+function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  document.querySelectorAll('.ingredient').forEach(i=>i.remove());
-  document.querySelectorAll('#plate-content img').forEach(i=>i.remove());
-  document.querySelectorAll('#progress img').forEach(i=>i.classList.remove('active'));
-
-  spawnInterval = setInterval(createIngredient, 420);
+  drawProducts();
+  drawPlate();
+  if(!gameOver){
+    updateProducts();
+  }
+  requestAnimationFrame(animate);
 }
 
-spawnInterval = setInterval(createIngredient, 420);
-</script>
+canvas.addEventListener('click', checkClick);
+restartBtn.addEventListener('click', resetGame);
 
+resetGame();
+loadImages();
+animate();
+</script>
 </body>
 </html>

@@ -26,17 +26,17 @@
   /* ===== ПРОГРЕСС ===== */
   #progress {
     position: fixed;
-    top: 100px;
+    top: 110px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 14px;
+    gap: 16px;
     z-index: 20;
   }
 
   #progress img {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     opacity: .3;
     filter: grayscale(1);
     transition: .3s;
@@ -50,12 +50,12 @@
   /* ===== ТАРЕЛКА ===== */
   #plate-wrapper {
     position: fixed;
-    bottom: -20px; /* ⬇️ опустили */
+    bottom: -70px; /* ⬇️ опустили ещё */
     left: 50%;
     transform: translateX(-50%);
-    width: 36vw;
-    max-width: 480px;
-    min-width: 320px;
+    width: 38vw;
+    max-width: 520px;
+    min-width: 340px;
     z-index: 10;
     pointer-events: none;
   }
@@ -67,12 +67,12 @@
 
   #plate-content {
     position: absolute;
-    inset: 20% 14% 22% 14%;
+    inset: 22% 15% 24% 15%;
   }
 
   #plate-content img {
     position: absolute;
-    width: 110px;
+    width: 120px;
     transition: transform .45s ease, opacity .45s ease;
     transform: scale(1.15);
   }
@@ -82,14 +82,9 @@
     position: fixed;
     cursor: pointer;
     z-index: 5;
-    transition: transform .2s;
   }
 
-  .ingredient:hover {
-    transform: scale(1.05);
-  }
-
-  .needed { width: 120px; }
+  .needed { width: 125px; }
   .wrong { width: 95px; }
 
   /* ===== ОШИБКА ===== */
@@ -181,6 +176,19 @@ function showError() {
   setTimeout(() => e.style.display = 'none', 300);
 }
 
+/* ===== ПРОВЕРКА ПОПАДАНИЯ ===== */
+function isOverPlate(el) {
+  const plateRect = document.getElementById('plate').getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+
+  const elCenterX = elRect.left + elRect.width / 2;
+
+  return (
+    elCenterX > plateRect.left &&
+    elCenterX < plateRect.right
+  );
+}
+
 /* ===== ПОБЕДА ===== */
 function checkWin() {
   if (collected.size === neededNames.length) {
@@ -242,8 +250,8 @@ function createIngredient() {
   let x = fromLeft ? -160 : innerWidth + 160;
   const endX = fromLeft ? innerWidth + 160 : -160;
 
-  /* ⬇️ поток ниже */
-  const y = 180 + Math.random() * (innerHeight * 0.32);
+  /* ⬇️ поток ниже, но выше тарелки */
+  const y = 220 + Math.random() * (innerHeight * 0.28);
 
   el.style.left = x+'px';
   el.style.top = y+'px';
@@ -262,20 +270,19 @@ function createIngredient() {
     clearInterval(fly);
 
     let top = el.getBoundingClientRect().top;
-    const plate = document.getElementById('plate');
-    const plateTop = plate.getBoundingClientRect().top + 20;
+    const plateTop = document.getElementById('plate').getBoundingClientRect().top + 25;
 
     const fall = setInterval(()=>{
       top += 8;
       el.style.top = top+'px';
 
-      /* 💡 проверяем центр ингредиента */
-      const center = top + el.offsetHeight / 2;
+      const elRect = el.getBoundingClientRect();
+      const centerY = elRect.top + elRect.height / 2;
 
-      if (center >= plateTop) {
+      if (centerY >= plateTop) {
         clearInterval(fall);
 
-        if (data.needed) {
+        if (data.needed && isOverPlate(el)) {
           collected.add(data.name);
           document.getElementById('p-'+data.name).classList.add('active');
 
@@ -288,7 +295,7 @@ function createIngredient() {
 
           requestAnimationFrame(()=>{
             clone.style.opacity = 1;
-            clone.style.transform = 'scale(1.2)';
+            clone.style.transform = 'scale(1.25)';
           });
 
           el.remove();

@@ -26,7 +26,7 @@
   /* ===== ПРОГРЕСС ===== */
   #progress {
     position: fixed;
-    top: 110px;
+    top: 130px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -35,8 +35,8 @@
   }
 
   #progress img {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     opacity: .3;
     filter: grayscale(1);
     transition: .3s;
@@ -50,13 +50,13 @@
   /* ===== ТАРЕЛКА ===== */
   #plate-wrapper {
     position: fixed;
-    bottom: -70px; /* ⬇️ опустили ещё */
+    bottom: -140px; /* ⬇️ ещё ниже */
     left: 50%;
     transform: translateX(-50%);
-    width: 38vw;
-    max-width: 520px;
-    min-width: 340px;
-    z-index: 10;
+    width: 40vw;
+    max-width: 560px;
+    min-width: 360px;
+    z-index: 15;
     pointer-events: none;
   }
 
@@ -67,14 +67,14 @@
 
   #plate-content {
     position: absolute;
-    inset: 22% 15% 24% 15%;
+    inset: 24% 16% 26% 16%;
   }
 
   #plate-content img {
     position: absolute;
     width: 120px;
+    transform: scale(1.2);
     transition: transform .45s ease, opacity .45s ease;
-    transform: scale(1.15);
   }
 
   /* ===== ИНГРЕДИЕНТЫ ===== */
@@ -84,8 +84,8 @@
     z-index: 5;
   }
 
-  .needed { width: 125px; }
-  .wrong { width: 95px; }
+  .needed { width: 135px; }
+  .wrong  { width: 100px; }
 
   /* ===== ОШИБКА ===== */
   #error {
@@ -115,7 +115,7 @@
 
   #win button {
     margin-top: 20px;
-    padding: 12px 24px;
+    padding: 12px 26px;
     font-size: 18px;
     border-radius: 8px;
     border: none;
@@ -151,6 +151,10 @@
 
 <canvas id="confetti"></canvas>
 
+<!-- ЗВУКИ -->
+<audio id="soundPluh" src="sounds/pluh.mp3"></audio>
+<audio id="soundWin" src="sounds/win.mp3"></audio>
+
 <script>
 const neededNames = ['potato','carrot','egg','pickle','peas','sausage','mayo'];
 const needed = neededNames.map(n => ({name:n, img:`images/${n}.png`, needed:true}));
@@ -160,6 +164,13 @@ const wrong = ['banana','apple','fish','cheese','donut','chili','cake']
 let collected = new Set();
 let gameActive = true;
 let spawnInterval;
+
+/* ===== ЗВУКИ ===== */
+const pluhSound = document.getElementById('soundPluh');
+pluhSound.volume = 0.25;
+
+const winSound = document.getElementById('soundWin');
+winSound.volume = 0.3;
 
 /* ===== ПРОГРЕСС ===== */
 const progress = document.getElementById('progress');
@@ -176,17 +187,12 @@ function showError() {
   setTimeout(() => e.style.display = 'none', 300);
 }
 
-/* ===== ПРОВЕРКА ПОПАДАНИЯ ===== */
+/* ===== ПРОВЕРКА НАД ТАРЕЛКОЙ ===== */
 function isOverPlate(el) {
   const plateRect = document.getElementById('plate').getBoundingClientRect();
   const elRect = el.getBoundingClientRect();
-
-  const elCenterX = elRect.left + elRect.width / 2;
-
-  return (
-    elCenterX > plateRect.left &&
-    elCenterX < plateRect.right
-  );
+  const centerX = elRect.left + elRect.width / 2;
+  return centerX > plateRect.left && centerX < plateRect.right;
 }
 
 /* ===== ПОБЕДА ===== */
@@ -195,6 +201,8 @@ function checkWin() {
     gameActive = false;
     clearInterval(spawnInterval);
     document.getElementById('win').style.display = 'flex';
+    winSound.currentTime = 0;
+    winSound.play();
     startConfetti();
   }
 }
@@ -234,7 +242,7 @@ function startConfetti() {
   })();
 }
 
-/* ===== ИНГРЕДИЕНТ ===== */
+/* ===== ИНГРЕДИЕНТЫ ===== */
 function createIngredient() {
   if (!gameActive) return;
 
@@ -247,11 +255,13 @@ function createIngredient() {
   document.body.appendChild(el);
 
   const fromLeft = Math.random() > .5;
-  let x = fromLeft ? -160 : innerWidth + 160;
-  const endX = fromLeft ? innerWidth + 160 : -160;
+  let x = fromLeft ? -180 : innerWidth + 180;
+  const endX = fromLeft ? innerWidth + 180 : -180;
 
-  /* ⬇️ поток ниже, но выше тарелки */
-  const y = 220 + Math.random() * (innerHeight * 0.28);
+  /* ⬇️ ЖЁСТКО выше тарелки */
+  const yMin = 260;
+  const yMax = innerHeight * 0.45;
+  const y = yMin + Math.random() * (yMax - yMin);
 
   el.style.left = x+'px';
   el.style.top = y+'px';
@@ -270,19 +280,22 @@ function createIngredient() {
     clearInterval(fly);
 
     let top = el.getBoundingClientRect().top;
-    const plateTop = document.getElementById('plate').getBoundingClientRect().top + 25;
+    const plateTop = document.getElementById('plate').getBoundingClientRect().top + 30;
 
     const fall = setInterval(()=>{
       top += 8;
       el.style.top = top+'px';
 
-      const elRect = el.getBoundingClientRect();
-      const centerY = elRect.top + elRect.height / 2;
+      const rect = el.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
 
       if (centerY >= plateTop) {
         clearInterval(fall);
 
         if (data.needed && isOverPlate(el)) {
+          pluhSound.currentTime = 0;
+          pluhSound.play();
+
           collected.add(data.name);
           document.getElementById('p-'+data.name).classList.add('active');
 

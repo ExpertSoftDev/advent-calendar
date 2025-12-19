@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Прогулка по городу</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url("images/background.png") center / cover no-repeat fixed;
+    color: #fff;
+  }
+
+  h1 {
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.6);
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: rgba(0,0,0,0.5);
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  #task {
+    font-size: 20px;
+    margin: 20px 0;
+    min-height: 80px;
+  }
+
+  button {
+    padding: 12px 20px;
+    margin: 8px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #ff5555;
+    color: #fff;
+    transition: background .2s;
+  }
+
+  button:hover {
+    background: #ff7777;
+  }
+
+  #finalMessage {
+    display: none;
+    font-size: 24px;
+    margin-top: 20px;
+    color: #ffdd00;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🎄 Прогулка по городу</h1>
+
+<div class="container">
+  <div id="task">Выйди на улицу и дойди до ближайшего перекрестка</div>
+
+  <button id="newTask">Новое задание</button>
+  <button id="skipTask">Пропустить задание</button>
+  <button id="finishWalk">Завершить прогулку</button>
+
+  <div id="finalMessage">🎉 Отличная прогулка завершена!</div>
+</div>
+
+<script>
+  // ===== Массив заданий (мешок) =====
+  const tasks = [
+    "Иди прямо до следующего перекрестка",
+    "Поверни налево и дойди до ближайшей остановки",
+    "Сядь на ближайший транспорт и проедь 2 остановки",
+    "Иди прямо до ближайшей кофейни, зайди туда и порадуй себя напитком или десертом",
+    "Найди что-то желтое и сделай селфи на фоне",
+    "Найди что-то круглое, сфотографируй и отправь фото другу",
+    "Поздоровайся с незнакомым прохожим",
+    "Сделай фотографию зимнего декора на улице",
+    "Обрати внимание на архитектуру и запомни один интересный дом",
+    "Попробуй найти красивый уличный фонарь и сфотографировать его",
+    "Подойди к витрине и выбери предмет, который тебе понравился",
+    "Иди прямо 5 минут и постарайся заметить необычный элемент в городе",
+    "Сделай шаг назад и посмотри на улицу с другого ракурса"
+  ];
+
+  let remainingTasks = [...tasks]; // оставшиеся задачи
+  let currentTask = document.getElementById("task");
+
+  function pickTask() {
+    if (remainingTasks.length === 0) {
+      remainingTasks = [...tasks]; // обновляем мешок
+    }
+
+    const index = Math.floor(Math.random() * remainingTasks.length);
+    const task = remainingTasks[index];
+    remainingTasks.splice(index, 1); // удаляем выбранное задание из мешка
+
+    currentTask.textContent = task;
+  }
+
+  document.getElementById("newTask").addEventListener("click", pickTask);
+  document.getElementById("skipTask").addEventListener("click", pickTask);
+
+  document.getElementById("finishWalk").addEventListener("click", () => {
+    document.getElementById("finalMessage").style.display = "block";
+  });
+
+</script>
+
+</body>
+</html>

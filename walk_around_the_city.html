@@ -3,116 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Прогулка по городу</title>
+<title>Прогулка-рандомайзер</title>
 
 <style>
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: url("images/background2.png") center / cover no-repeat fixed;
+    background: radial-gradient(circle at center, #1a0933, #000);
     color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 520px;
+    box-shadow: 0 0 30px rgba(180,120,255,.3);
+    text-align: center;
   }
 
   h1 {
-    text-align: center;
-    margin-top: 20px;
-    text-shadow: 0 2px 8px rgba(0,0,0,.6);
-  }
-
-  .container {
-    max-width: 600px;
-    margin: 40px auto;
-    background: rgba(0,0,0,0.5);
-    padding: 24px;
-    border-radius: 16px;
-    text-align: center;
+    margin-top: 0;
+    font-size: 28px;
   }
 
   #task {
+    margin: 30px 0;
     font-size: 20px;
-    margin: 20px 0;
-    min-height: 80px;
+    line-height: 1.4;
+    min-height: 90px;
   }
 
   button {
-    padding: 12px 20px;
     margin: 8px;
+    padding: 12px 18px;
     font-size: 16px;
-    border: none;
     border-radius: 8px;
+    border: none;
     cursor: pointer;
-    background: #ff5555;
+    background: rgba(255,255,255,0.2);
     color: #fff;
-    transition: background .2s;
+    transition: .2s;
   }
 
   button:hover {
-    background: #ff7777;
+    background: rgba(255,215,0,.7);
+    color: #000;
   }
 
-  #finalMessage {
+  #finishScreen {
     display: none;
-    font-size: 24px;
+    text-align: left;
     margin-top: 20px;
-    color: #ffdd00;
+  }
+
+  #finishScreen h2 {
+    text-align: center;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 8px;
   }
 </style>
 </head>
 
 <body>
 
-<h1>🎄 Прогулка по городу</h1>
+<div class="card">
+  <h1>🎄 Прогулка-рандомайзер</h1>
 
-<div class="container">
-  <div id="task">Выйди на улицу и дойди до ближайшего перекрестка</div>
+  <div id="task">
+    Нажми «Начнём прогулку», когда будешь готов(а) выйти.
+  </div>
 
-  <button id="newTask">Новое задание</button>
-  <button id="skipTask">Пропустить задание</button>
-  <button id="finishWalk">Завершить прогулку</button>
+  <div id="buttons">
+    <button id="mainBtn">Начнём прогулку</button>
+    <button id="skipBtn">Пропустить задание</button>
+    <button id="finishBtn">Завершить прогулку</button>
+  </div>
 
-  <div id="finalMessage">🎉 Отличная прогулка завершена!</div>
+  <div id="finishScreen">
+    <h2>✨ Сегодня ты:</h2>
+    <ul id="doneList"></ul>
+  </div>
 </div>
 
 <script>
-  // ===== Массив заданий (мешок) =====
-  const tasks = [
-    "Иди прямо до следующего перекрестка",
-    "Поверни налево и дойди до ближайшей остановки",
-    "Сядь на ближайший транспорт и проедь 2 остановки",
-    "Иди прямо до ближайшей кофейни, зайди туда и порадуй себя напитком или десертом",
-    "Найди что-то желтое и сделай селфи на фоне",
-    "Найди что-то круглое, сфотографируй и отправь фото другу",
-    "Поздоровайся с незнакомым прохожим",
-    "Сделай фотографию зимнего декора на улице",
-    "Обрати внимание на архитектуру и запомни один интересный дом",
-    "Попробуй найти красивый уличный фонарь и сфотографировать его",
-    "Подойди к витрине и выбери предмет, который тебе понравился",
-    "Иди прямо 5 минут и постарайся заметить необычный элемент в городе",
-    "Сделай шаг назад и посмотри на улицу с другого ракурса"
-  ];
+/* ===== СПИСОК ЗАДАНИЙ =====
+   Можно свободно добавлять, удалять и менять формулировки */
+const tasksSource = [
+  'вышел(ла) на улицу и дошёл(ла) до ближайшего перекрёстка',
+  'пошёл(ла) прямо до следующего перекрёстка',
+  'повернул(ла) налево и дошёл(ла) до ближайшей остановки',
+  'повернул(ла) направо и прошёл(ла) один квартал',
+  'дошёл(ла) до ближайшей кофейни и порадовал(а) себя напитком',
+  'нашёл(ла) что-то жёлтое и сделал(а) фото',
+  'нашёл(ла) что-то круглое и сфотографировал(а)',
+  'обратил(а) внимание на красивый балкон или окно',
+  'посчитал(а) три ёлки или новогодних украшения',
+  'нашёл(ла) смешную вывеску или надпись',
+  'зашёл(ла) в любой магазин и просто посмотрел(а) вокруг',
+  'прошёл(ла) до ближайшего парка или сквера',
+  'улыбнулся(лась) прохожему',
+  'нашёл(ла) дом, в котором никогда раньше не был(а)',
+  'сделал(а) фото неба или отражений в витрине',
+  'прошёл(ла)ся без телефона хотя бы 5 минут'
+];
 
-  let remainingTasks = [...tasks]; // оставшиеся задачи
-  let currentTask = document.getElementById("task");
+/* ===== СОСТОЯНИЕ ===== */
+let bag = [];
+let currentTask = null;
+let started = false;
+let doneTasks = [];
 
-  function pickTask() {
-    if (remainingTasks.length === 0) {
-      remainingTasks = [...tasks]; // обновляем мешок
-    }
+/* ===== ЭЛЕМЕНТЫ ===== */
+const taskEl = document.getElementById('task');
+const mainBtn = document.getElementById('mainBtn');
+const skipBtn = document.getElementById('skipBtn');
+const finishBtn = document.getElementById('finishBtn');
+const finishScreen = document.getElementById('finishScreen');
+const doneList = document.getElementById('doneList');
 
-    const index = Math.floor(Math.random() * remainingTasks.length);
-    const task = remainingTasks[index];
-    remainingTasks.splice(index, 1); // удаляем выбранное задание из мешка
+/* ===== МЕШОК ЗАДАНИЙ ===== */
+function refillBag() {
+  bag = [...tasksSource].sort(() => Math.random() - 0.5);
+}
 
-    currentTask.textContent = task;
+function nextTask() {
+  if (bag.length === 0) refillBag();
+  currentTask = bag.pop();
+  taskEl.textContent = currentTask;
+}
+
+/* ===== КНОПКИ ===== */
+mainBtn.onclick = () => {
+  if (!started) {
+    started = true;
+    refillBag();
+    nextTask();
+    mainBtn.textContent = 'Сделано';
+  } else {
+    doneTasks.push(currentTask);
+    nextTask();
   }
+};
 
-  document.getElementById("newTask").addEventListener("click", pickTask);
-  document.getElementById("skipTask").addEventListener("click", pickTask);
+skipBtn.onclick = () => {
+  if (!started) return;
+  nextTask();
+};
 
-  document.getElementById("finishWalk").addEventListener("click", () => {
-    document.getElementById("finalMessage").style.display = "block";
+finishBtn.onclick = () => {
+  taskEl.style.display = 'none';
+  document.getElementById('buttons').style.display = 'none';
+  finishScreen.style.display = 'block';
+
+  doneList.innerHTML = '';
+  doneTasks.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    doneList.appendChild(li);
   });
 
+  if (doneTasks.length === 0) {
+    doneList.innerHTML = '<li>просто хорошо прогулялся(лась)</li>';
+  }
+};
 </script>
 
 </body>

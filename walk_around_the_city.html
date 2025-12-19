@@ -6,188 +6,221 @@
 <title>Зимняя прогулка</title>
 
 <style>
-:root {
-  --glass: rgba(255,255,255,.75);
-  --glass-dark: rgba(20,30,60,.65);
-  --text-dark: #1f2937;
-  --text-light: #ffffff;
-  --accent: #3b82f6;
-}
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at center, #1a0933, #000);
+    color: #fff;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  overflow: hidden;
-  transition: background 1s, color 1s;
-}
+  /* ❄️ СНЕЖИНКИ */
+  .snowflake {
+    position: fixed;
+    top: -20px;
+    color: #fff;
+    opacity: .8;
+    pointer-events: none;
+    animation: fall linear infinite;
+  }
 
-/* ===== ТЕМЫ ===== */
-body.day {
-  background: linear-gradient(180deg, #eaf4ff, #ffffff);
-  color: var(--text-dark);
-}
+  @keyframes fall {
+    to {
+      transform: translateY(110vh);
+    }
+  }
 
-body.night {
-  background: radial-gradient(circle at top, #1b255a, #050812);
-  color: var(--text-light);
-}
+  .card {
+    position: relative;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    border-radius: 22px;
+    padding: 32px 30px 36px;
+    width: 90%;
+    max-width: 520px;
+    box-shadow:
+      0 0 30px rgba(180,120,255,.35),
+      inset 0 0 25px rgba(255,255,255,.08);
+    text-align: center;
+    z-index: 10;
+  }
 
-/* ===== ОБЩИЕ БЛОКИ ===== */
-.wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  h1 {
+    margin-top: 0;
+    font-size: 28px;
+  }
 
-.card {
-  width: min(92%, 520px);
-  padding: 28px 26px 32px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 20px 40px rgba(0,0,0,.25);
-}
+  #task {
+    margin: 30px 0;
+    font-size: 21px;
+    line-height: 1.4;
+    min-height: 90px;
+  }
 
-.day .card {
-  background: var(--glass);
-}
+  /* 🧊 НАЛЕДЬ НА КНОПКАХ */
+  #buttons {
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    box-shadow: inset 0 12px 18px rgba(255,255,255,.08);
+  }
 
-.night .card {
-  background: var(--glass-dark);
-}
+  button {
+    margin: 8px;
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    transition: .2s;
+  }
 
-h1 {
-  margin: 0 0 10px;
-  text-align: center;
-  font-size: 26px;
-}
+  button:hover {
+    background: rgba(200,170,255,.85);
+    color: #000;
+  }
 
-.intro {
-  text-align: center;
-  opacity: .85;
-  margin-bottom: 18px;
-  line-height: 1.5;
-}
+  #finishScreen {
+    display: none;
+    text-align: left;
+    margin-top: 20px;
+  }
 
-/* ===== ЗАДАНИЕ ===== */
-.task {
-  font-size: 20px;
-  text-align: center;
-  margin: 22px 0 26px;
-  min-height: 72px;
-}
+  #finishScreen h2 {
+    text-align: center;
+  }
 
-/* ===== КНОПКИ ===== */
-.buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+  ul {
+    padding-left: 20px;
+  }
 
-button {
-  font-size: 16px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  transition: transform .1s, opacity .2s;
-}
-
-button:hover { transform: translateY(-1px); }
-
-.primary {
-  background: #22c55e;
-  color: #fff;
-}
-
-.secondary {
-  background: #f59e0b;
-  color: #fff;
-}
-
-.finish {
-  background: #ef4444;
-  color: #fff;
-}
-
-/* ===== ИТОГ ===== */
-#summary {
-  display: none;
-}
-
-#summary ul {
-  margin: 14px 0 0;
-  padding-left: 18px;
-}
-
-/* ===== СНЕГ / МЕРЦАНИЕ ===== */
-.snow, .sparkle {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: -1;
-}
-
-/* НОЧЬ: падающий снег */
-.snow span {
-  position: absolute;
-  top: -10px;
-  width: 6px;
-  height: 6px;
-  background: white;
-  border-radius: 50%;
-  opacity: .8;
-  animation: fall linear infinite;
-}
-
-@keyframes fall {
-  to { transform: translateY(110vh); }
-}
-
-/* ДЕНЬ: мерцание снега */
-.sparkle span {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0;
-  animation: sparkle 4s ease-in-out infinite;
-}
-
-@keyframes sparkle {
-  0% { opacity: 0; }
-  50% { opacity: .9; }
-  100% { opacity: 0; }
-}
+  li {
+    margin-bottom: 8px;
+  }
 </style>
 </head>
 
 <body>
 
-<div class="snow" id="snow"></div>
-<div class="sparkle" id="sparkle"></div>
+<!-- ❄️ СНЕГ -->
+<script>
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'snowflake';
+    s.textContent = '❄️';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.fontSize = 12 + Math.random() * 18 + 'px';
+    s.style.animationDuration = 8 + Math.random() * 12 + 's';
+    s.style.opacity = Math.random();
+    document.body.appendChild(s);
+  }
+</script>
 
-<div class="wrapper">
-  <div class="card">
+<div class="card">
+  <h1>❄️ Зимняя прогулка</h1>
 
-    <h1>❄️ Зимняя прогулка</h1>
+  <div id="task">
+    Готов(а) к небольшой прогулке?<br>
+    Нажми кнопку ниже и следуй подсказкам.
+  </div>
 
-    <div class="intro" id="intro">
-      Небольшой эксперимент: кнопка подсказывает направление,  
-      город — всё остальное.
-    </div>
+  <div id="buttons">
+    <button id="mainBtn">▶️ Начнём прогулку</button>
+    <button id="skipBtn">⏭ Пропустить</button>
+    <button id="finishBtn">🏁 Завершить прогулку</button>
+  </div>
 
-    <div class="task" id="task">
-      Выйди на улицу и дойди до ближайшего перекрёстка
-    </div>
+  <div id="finishScreen">
+    <h2>✨ Сегодня ты:</h2>
+    <ul id="doneList"></ul>
+  </div>
+</div>
 
-    <div class="buttons">
-      <button class="primary" id="mainBtn">🚶 Начать прогулку</button>
-      <button class="secondary" id="skipBtn">⏭ Пропустить задание</button>
-      <button class="finish" id="finishBtn">🏁 Завершить прогулку</button>
-    </div>
+<script>
+/* ===== ЗАДАНИЯ (ЛЕГКО РЕДАКТИРОВАТЬ) ===== */
+const tasksSource = [
+  'Иди до ближайшего перекрёстка',
+  'Поверни налево и иди до остановки',
+  'Поверни направо и пройди один квартал',
+  'Иди прямо, пока не увидишь кафе',
+  'Найди что-то жёлтое и сделай фото',
+  'Найди что-то круглое и сфотографируй',
+  'Обрати внимание на красивое окно или витрину',
+  'Посчитай три новогодних украшения',
+  'Найди смешную вывеску',
+  'Сделай фото отражений в витрине',
+  'Пройди 5 минут без телефона',
+  'Зайди в любой магазин и просто осмотрись',
+  'Найди дом, в котором никогда не был(а)',
+  'Посмотри на небо и сделай фото',
+  'Улыбнись кому-нибудь по дороге'
+];
 
-    <div id="summary">
-      <h2>✨ Сегодня получило
+/* ===== СОСТОЯНИЕ ===== */
+let bag = [];
+let currentTask = null;
+let started = false;
+let doneTasks = [];
+
+/* ===== ЭЛЕМЕНТЫ ===== */
+const taskEl = document.getElementById('task');
+const mainBtn = document.getElementById('mainBtn');
+const skipBtn = document.getElementById('skipBtn');
+const finishBtn = document.getElementById('finishBtn');
+const finishScreen = document.getElementById('finishScreen');
+const doneList = document.getElementById('doneList');
+
+/* ===== МЕШОК ===== */
+function refillBag() {
+  bag = [...tasksSource].sort(() => Math.random() - 0.5);
+}
+
+function nextTask() {
+  if (bag.length === 0) refillBag();
+  currentTask = bag.pop();
+  taskEl.textContent = currentTask;
+}
+
+/* ===== КНОПКИ ===== */
+mainBtn.onclick = () => {
+  if (!started) {
+    started = true;
+    refillBag();
+    nextTask();
+    mainBtn.textContent = '✅ Сделано';
+  } else {
+    doneTasks.push(currentTask);
+    nextTask();
+  }
+};
+
+skipBtn.onclick = () => {
+  if (!started) return;
+  nextTask();
+};
+
+finishBtn.onclick = () => {
+  taskEl.style.display = 'none';
+  document.getElementById('buttons').style.display = 'none';
+  finishScreen.style.display = 'block';
+
+  doneList.innerHTML = '';
+  doneTasks.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    doneList.appendChild(li);
+  });
+
+  if (doneTasks.length === 0) {
+    doneList.innerHTML = '<li>Просто хорошо прогулялся(лась)</li>';
+  }
+};
+</script>
+
+</body>
+</html>

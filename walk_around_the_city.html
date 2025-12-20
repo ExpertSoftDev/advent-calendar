@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Зимняя прогулка</title>
+<title>Прогулка-сюрприз</title>
 
 <style>
   body {
@@ -14,17 +14,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background .4s, color .4s;
+    transition: background 0.6s, color 0.6s;
   }
 
-  /* ===== ТЕМЫ ===== */
+  /* 🌙 НОЧЬ */
   body.night {
     background: radial-gradient(circle at center, #1a0933, #000);
     color: #fff;
   }
 
+  /* ☀️ ДЕНЬ */
   body.day {
-    background: radial-gradient(circle at center, #eaf3ff, #cfdfff);
+    background: radial-gradient(circle at center, #f4f8ff, #dbe6ff);
     color: #1a1a1a;
   }
 
@@ -32,64 +33,62 @@
   .snowflake {
     position: fixed;
     top: -20px;
+    color: #fff;
+    opacity: .8;
     pointer-events: none;
     animation: fall linear infinite;
   }
 
-  body.night .snowflake {
-    color: #fff;
-    opacity: .8;
-  }
-
   body.day .snowflake {
-    opacity: 0;
+    display: none;
   }
 
   @keyframes fall {
     to { transform: translateY(110vh); }
   }
 
-  /* ✨ МЕРЦАНИЕ (день) */
+  /* ✨ БЛЕСК СНЕГА (день) */
   .sparkle {
     position: fixed;
-    width: 4px;
-    height: 4px;
-    background: white;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    opacity: .6;
+    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
     pointer-events: none;
-    animation: sparkle 6s infinite alternate;
+    animation: shimmer 4s infinite ease-in-out;
   }
 
   body.night .sparkle {
     display: none;
   }
 
-  @keyframes sparkle {
-    from { opacity: .2; }
-    to { opacity: .8; }
+  @keyframes shimmer {
+    0%   { opacity: 0; transform: scale(0.6); }
+    50%  { opacity: 0.9; transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(0.6); }
   }
 
   .card {
     position: relative;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
     border-radius: 22px;
-    padding: 32px 30px 36px;
+    padding: 34px 30px 36px;
     width: 90%;
     max-width: 520px;
     box-shadow:
-      0 0 30px rgba(180,120,255,.35),
+      0 0 30px rgba(180,120,255,.25),
       inset 0 0 25px rgba(255,255,255,.08);
     text-align: center;
     z-index: 10;
   }
 
   body.day .card {
-    background: rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.75);
     box-shadow:
-      0 0 25px rgba(120,160,255,.35),
-      inset 0 0 20px rgba(255,255,255,.4);
+      0 12px 30px rgba(120,160,255,.35),
+      inset 0 0 25px rgba(255,255,255,.9);
   }
 
   h1 {
@@ -104,82 +103,76 @@
     min-height: 90px;
   }
 
-  /* ===== КНОПКИ ===== */
+  /* 🧊 КНОПКИ */
   #buttons {
-    padding-top: 20px;
-    border-top: 1px solid rgba(255,255,255,.15);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.15);
   }
 
   button {
-    padding: 12px 18px;
+    padding: 14px 18px;
     font-size: 16px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: none;
     cursor: pointer;
-    background: rgba(255,255,255,0.25);
-    color: inherit;
-    transition: .2s;
+    transition: .25s;
+  }
+
+  /* 🌙 ночь */
+  body.night button {
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    box-shadow: inset 0 0 10px rgba(255,255,255,.12);
+  }
+
+  /* ☀️ день */
+  body.day button {
+    background: linear-gradient(
+      180deg,
+      #ffffff,
+      #e9f1ff
+    );
+    color: #1a1a1a;
+    box-shadow:
+      0 4px 14px rgba(120,160,255,.45),
+      inset 0 0 12px rgba(255,255,255,.9);
   }
 
   button:hover {
-    background: rgba(200,170,255,.85);
-    color: #000;
+    transform: translateY(-1px);
   }
 
-  /* ===== ТУМБЛЕР ===== */
-  .theme-toggle {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  /* 🌗 ТУМБЛЕР */
+  #themeToggle {
+    position: fixed;
+    top: 14px;
+    right: 14px;
     font-size: 14px;
-  }
-
-  .switch {
-    width: 44px;
-    height: 24px;
-    background: #999;
+    padding: 8px 14px;
     border-radius: 20px;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .switch::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 18px;
-    height: 18px;
-    background: white;
-    border-radius: 50%;
-    transition: .3s;
-  }
-
-  body.day .switch {
-    background: #6aa9ff;
-  }
-
-  body.day .switch::after {
-    left: 23px;
+    z-index: 50;
   }
 
   #finishScreen {
     display: none;
-    margin-top: 20px;
+    margin-top: 10px;
+  }
+
+  #finishScreen h2 {
+    margin-top: 0;
   }
 </style>
 </head>
 
 <body class="night">
 
-<!-- ❄️ СНЕГ -->
+<button id="themeToggle">☀️ День</button>
+
 <script>
+  /* ❄️ СНЕГ */
   for (let i = 0; i < 40; i++) {
     const s = document.createElement('div');
     s.className = 'snowflake';
@@ -190,22 +183,19 @@
     document.body.appendChild(s);
   }
 
-  for (let i = 0; i < 50; i++) {
+  /* ✨ БЛЕСК */
+  for (let i = 0; i < 60; i++) {
     const sp = document.createElement('div');
     sp.className = 'sparkle';
     sp.style.left = Math.random() * 100 + 'vw';
     sp.style.top = Math.random() * 100 + 'vh';
+    sp.style.animationDelay = Math.random() * 4 + 's';
     document.body.appendChild(sp);
   }
 </script>
 
-<div class="card">
-  <div class="theme-toggle">
-    🌙 ☀️
-    <div class="switch" id="themeSwitch"></div>
-  </div>
-
-  <h1>Прогулка-сюрприз</h1>
+<div class="card" id="card">
+  <h1 id="title">Прогулка-сюрприз</h1>
 
   <div id="task">
     Пора выйти на прогулку 😉<br>
@@ -220,24 +210,15 @@
 
   <div id="finishScreen">
     <h2>✨ Прогулка завершена</h2>
-    <p>Спасибо за эту прогулку ❄️<br>Пусть она оставит приятное послевкусие.</p>
+    <p>
+      Спасибо за эту прогулку ❄️<br>
+      Надеюсь, она получилась приятной и с ноткой волшебства.
+    </p>
   </div>
 </div>
 
 <script>
-/* ===== ТУМБЛЕР ===== */
-const switcher = document.getElementById('themeSwitch');
-const savedTheme = localStorage.getItem('theme');
-
-if (savedTheme) document.body.className = savedTheme;
-
-switcher.onclick = () => {
-  document.body.classList.toggle('day');
-  document.body.classList.toggle('night');
-  localStorage.setItem('theme', document.body.className);
-};
-
-/* ===== ЛОГИКА ИГРЫ (БЕЗ ИЗМЕНЕНИЙ) ===== */
+/* ===== ЗАДАНИЯ ===== */
 const tasksSource = [
   'Иди до ближайшего перекрёстка',
   'Поверни налево и иди до остановки',
@@ -251,11 +232,13 @@ const tasksSource = [
   'Сделай фото отражений в витрине',
   'Пройди 5 минут без телефона',
   'Зайди в любой магазин и просто осмотрись',
+  'Найди дом, в котором раньше не бывал',
   'Посмотри на небо и сделай фото',
   'Улыбнись кому-нибудь по дороге'
 ];
 
 let bag = [];
+let currentTask = null;
 let started = false;
 
 const taskEl = document.getElementById('task');
@@ -263,14 +246,16 @@ const mainBtn = document.getElementById('mainBtn');
 const skipBtn = document.getElementById('skipBtn');
 const finishBtn = document.getElementById('finishBtn');
 const finishScreen = document.getElementById('finishScreen');
+const titleEl = document.getElementById('title');
 
 function refillBag() {
   bag = [...tasksSource].sort(() => Math.random() - 0.5);
 }
 
 function nextTask() {
-  if (!bag.length) refillBag();
-  taskEl.textContent = bag.pop();
+  if (bag.length === 0) refillBag();
+  currentTask = bag.pop();
+  taskEl.textContent = currentTask;
 }
 
 mainBtn.onclick = () => {
@@ -285,13 +270,25 @@ mainBtn.onclick = () => {
 };
 
 skipBtn.onclick = () => {
-  if (started) nextTask();
+  if (!started) return;
+  nextTask();
 };
 
 finishBtn.onclick = () => {
   taskEl.style.display = 'none';
   document.getElementById('buttons').style.display = 'none';
+  titleEl.style.display = 'none';
   finishScreen.style.display = 'block';
+};
+
+/* 🌗 ТУМБЛЕР */
+const toggle = document.getElementById('themeToggle');
+toggle.onclick = () => {
+  document.body.classList.toggle('day');
+  document.body.classList.toggle('night');
+  toggle.textContent = document.body.classList.contains('day')
+    ? '🌙 Ночь'
+    : '☀️ День';
 };
 </script>
 

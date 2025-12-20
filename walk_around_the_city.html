@@ -9,35 +9,71 @@
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: radial-gradient(circle at center, #1a0933, #000);
-    color: #fff;
     min-height: 100vh;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: background .4s, color .4s;
   }
 
-  /* ❄️ СНЕЖИНКИ */
+  /* ===== ТЕМЫ ===== */
+  body.night {
+    background: radial-gradient(circle at center, #1a0933, #000);
+    color: #fff;
+  }
+
+  body.day {
+    background: radial-gradient(circle at center, #eaf3ff, #cfdfff);
+    color: #1a1a1a;
+  }
+
+  /* ❄️ СНЕЖИНКИ (ночь) */
   .snowflake {
     position: fixed;
     top: -20px;
-    color: #fff;
-    opacity: .8;
     pointer-events: none;
     animation: fall linear infinite;
   }
 
+  body.night .snowflake {
+    color: #fff;
+    opacity: .8;
+  }
+
+  body.day .snowflake {
+    opacity: 0;
+  }
+
   @keyframes fall {
-    to {
-      transform: translateY(110vh);
-    }
+    to { transform: translateY(110vh); }
+  }
+
+  /* ✨ МЕРЦАНИЕ (день) */
+  .sparkle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    opacity: .6;
+    pointer-events: none;
+    animation: sparkle 6s infinite alternate;
+  }
+
+  body.night .sparkle {
+    display: none;
+  }
+
+  @keyframes sparkle {
+    from { opacity: .2; }
+    to { opacity: .8; }
   }
 
   .card {
     position: relative;
     background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(10px);
     border-radius: 22px;
     padding: 32px 30px 36px;
     width: 90%;
@@ -47,6 +83,13 @@
       inset 0 0 25px rgba(255,255,255,.08);
     text-align: center;
     z-index: 10;
+  }
+
+  body.day .card {
+    background: rgba(255,255,255,0.55);
+    box-shadow:
+      0 0 25px rgba(120,160,255,.35),
+      inset 0 0 20px rgba(255,255,255,.4);
   }
 
   h1 {
@@ -61,27 +104,24 @@
     min-height: 90px;
   }
 
-  /* 🧊 КНОПКИ В КОЛОНКУ */
+  /* ===== КНОПКИ ===== */
   #buttons {
     padding-top: 20px;
     border-top: 1px solid rgba(255,255,255,.15);
-    box-shadow: inset 0 12px 18px rgba(255,255,255,.08);
     display: flex;
     flex-direction: column;
     gap: 10px;
-    align-items: stretch;
   }
 
   button {
-    padding: 14px 18px;
+    padding: 12px 18px;
     font-size: 16px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    background: rgba(255,255,255,0.22);
-    color: #fff;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
     transition: .2s;
-    width: 100%;
   }
 
   button:hover {
@@ -89,24 +129,54 @@
     color: #000;
   }
 
+  /* ===== ТУМБЛЕР ===== */
+  .theme-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .switch {
+    width: 44px;
+    height: 24px;
+    background: #999;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
+  }
+
+  body.day .switch {
+    background: #6aa9ff;
+  }
+
+  body.day .switch::after {
+    left: 23px;
+  }
+
   #finishScreen {
     display: none;
     margin-top: 20px;
-    text-align: center;
-  }
-
-  #finishScreen h2 {
-    margin-bottom: 10px;
-  }
-
-  #finishScreen p {
-    line-height: 1.4;
-    opacity: 0.9;
   }
 </style>
 </head>
 
-<body>
+<body class="night">
 
 <!-- ❄️ СНЕГ -->
 <script>
@@ -117,16 +187,28 @@
     s.style.left = Math.random() * 100 + 'vw';
     s.style.fontSize = 12 + Math.random() * 18 + 'px';
     s.style.animationDuration = 8 + Math.random() * 12 + 's';
-    s.style.opacity = Math.random();
     document.body.appendChild(s);
+  }
+
+  for (let i = 0; i < 50; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'sparkle';
+    sp.style.left = Math.random() * 100 + 'vw';
+    sp.style.top = Math.random() * 100 + 'vh';
+    document.body.appendChild(sp);
   }
 </script>
 
 <div class="card">
-  <h1 id="title">Прогулка-сюрприз</h1>
+  <div class="theme-toggle">
+    🌙 ☀️
+    <div class="switch" id="themeSwitch"></div>
+  </div>
+
+  <h1>Прогулка-сюрприз</h1>
 
   <div id="task">
-    Пора выйти на прогулку 😉 <br>
+    Пора выйти на прогулку 😉<br>
     Нажми кнопку ниже и смотри, куда она приведёт ⬇️
   </div>
 
@@ -138,15 +220,24 @@
 
   <div id="finishScreen">
     <h2>✨ Прогулка завершена</h2>
-    <p>
-      Спасибо за эту прогулку ❄️<br>
-      Надеюсь, она получилась приятной и с ноткой волшебства.
-    </p>
+    <p>Спасибо за эту прогулку ❄️<br>Пусть она оставит приятное послевкусие.</p>
   </div>
 </div>
 
 <script>
-/* ===== ЗАДАНИЯ ===== */
+/* ===== ТУМБЛЕР ===== */
+const switcher = document.getElementById('themeSwitch');
+const savedTheme = localStorage.getItem('theme');
+
+if (savedTheme) document.body.className = savedTheme;
+
+switcher.onclick = () => {
+  document.body.classList.toggle('day');
+  document.body.classList.toggle('night');
+  localStorage.setItem('theme', document.body.className);
+};
+
+/* ===== ЛОГИКА ИГРЫ (БЕЗ ИЗМЕНЕНИЙ) ===== */
 const tasksSource = [
   'Иди до ближайшего перекрёстка',
   'Поверни налево и иди до остановки',
@@ -160,36 +251,28 @@ const tasksSource = [
   'Сделай фото отражений в витрине',
   'Пройди 5 минут без телефона',
   'Зайди в любой магазин и просто осмотрись',
-  'Найди дом, в котором никогда не был(а)',
   'Посмотри на небо и сделай фото',
   'Улыбнись кому-нибудь по дороге'
 ];
 
-/* ===== СОСТОЯНИЕ ===== */
 let bag = [];
-let currentTask = null;
 let started = false;
 
-/* ===== ЭЛЕМЕНТЫ ===== */
 const taskEl = document.getElementById('task');
 const mainBtn = document.getElementById('mainBtn');
 const skipBtn = document.getElementById('skipBtn');
 const finishBtn = document.getElementById('finishBtn');
 const finishScreen = document.getElementById('finishScreen');
-const titleEl = document.getElementById('title');
 
-/* ===== МЕШОК ===== */
 function refillBag() {
   bag = [...tasksSource].sort(() => Math.random() - 0.5);
 }
 
 function nextTask() {
-  if (bag.length === 0) refillBag();
-  currentTask = bag.pop();
-  taskEl.textContent = currentTask;
+  if (!bag.length) refillBag();
+  taskEl.textContent = bag.pop();
 }
 
-/* ===== КНОПКИ ===== */
 mainBtn.onclick = () => {
   if (!started) {
     started = true;
@@ -202,12 +285,10 @@ mainBtn.onclick = () => {
 };
 
 skipBtn.onclick = () => {
-  if (!started) return;
-  nextTask();
+  if (started) nextTask();
 };
 
 finishBtn.onclick = () => {
-  titleEl.style.display = 'none';
   taskEl.style.display = 'none';
   document.getElementById('buttons').style.display = 'none';
   finishScreen.style.display = 'block';

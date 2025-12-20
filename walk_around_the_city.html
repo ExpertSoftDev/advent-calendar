@@ -87,20 +87,17 @@
 
   #finishScreen {
     display: none;
-    text-align: left;
     margin-top: 20px;
-  }
-
-  #finishScreen h2 {
     text-align: center;
   }
 
-  ul {
-    padding-left: 20px;
+  #finishScreen h2 {
+    margin-bottom: 10px;
   }
 
-  li {
-    margin-bottom: 8px;
+  #finishScreen p {
+    line-height: 1.4;
+    opacity: 0.9;
   }
 </style>
 </head>
@@ -136,8 +133,11 @@
   </div>
 
   <div id="finishScreen">
-    <h2>✨ Сегодня ты:</h2>
-    <ul id="doneList"></ul>
+    <h2>✨ Прогулка завершена</h2>
+    <p>
+      Спасибо за эту прогулку ❄️<br>
+      Надеюсь, она получилась приятной и с ноткой волшебства.
+    </p>
   </div>
 </div>
 
@@ -165,7 +165,6 @@ const tasksSource = [
 let bag = [];
 let currentTask = null;
 let started = false;
-let doneTasks = [];
 
 /* ===== ЭЛЕМЕНТЫ ===== */
 const taskEl = document.getElementById('task');
@@ -173,7 +172,6 @@ const mainBtn = document.getElementById('mainBtn');
 const skipBtn = document.getElementById('skipBtn');
 const finishBtn = document.getElementById('finishBtn');
 const finishScreen = document.getElementById('finishScreen');
-const doneList = document.getElementById('doneList');
 
 /* ===== МЕШОК ===== */
 function refillBag() {
@@ -194,7 +192,6 @@ mainBtn.onclick = () => {
     nextTask();
     mainBtn.textContent = '✅ Сделано';
   } else {
-    doneTasks.push(currentTask);
     nextTask();
   }
 };
@@ -208,17 +205,6 @@ finishBtn.onclick = () => {
   taskEl.style.display = 'none';
   document.getElementById('buttons').style.display = 'none';
   finishScreen.style.display = 'block';
-
-  doneList.innerHTML = '';
-  doneTasks.forEach(t => {
-    const li = document.createElement('li');
-    li.textContent = t;
-    doneList.appendChild(li);
-  });
-
-  if (doneTasks.length === 0) {
-    doneList.innerHTML = '<li>Просто хорошо прогулялся(лась)</li>';
-  }
 };
 </script>
 

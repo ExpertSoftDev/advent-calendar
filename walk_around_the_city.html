@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Зимняя прогулка</title>
+<title>Прогулка-сюрприз</title>
 
 <style>
   body {
@@ -19,11 +19,6 @@
     transition: background 0.5s, color 0.5s;
   }
 
-  body.day {
-    background: radial-gradient(circle at center, #cce8ff, #aaddff);
-    color: #000;
-  }
-
   /* ❄️ СНЕЖИНКИ */
   .snowflake {
     position: fixed;
@@ -32,19 +27,10 @@
     opacity: .8;
     pointer-events: none;
     animation: fall linear infinite;
-    text-shadow: 0 0 4px rgba(255,255,255,0.8);
-  }
-
-  body.day .snowflake {
-    color: #fff;
-    text-shadow: 0 0 8px rgba(255,255,255,0.8);
-    opacity: 0.9;
   }
 
   @keyframes fall {
-    to {
-      transform: translateY(110vh);
-    }
+    to { transform: translateY(110vh); }
   }
 
   .card {
@@ -62,13 +48,6 @@
     z-index: 10;
   }
 
-  body.day .card {
-    background: rgba(255,255,255,0.15);
-    box-shadow:
-      0 0 20px rgba(200,200,255,.35),
-      inset 0 0 20px rgba(255,255,255,.12);
-  }
-
   h1 {
     margin-top: 0;
     font-size: 28px;
@@ -81,7 +60,6 @@
     min-height: 90px;
   }
 
-  /* 🧊 НАЛЕДЬ НА КНОПКАХ */
   #buttons {
     display: flex;
     flex-direction: column;
@@ -101,12 +79,8 @@
     background: rgba(255,255,255,0.22);
     color: #fff;
     transition: .2s;
-    width: 60%;
-  }
-
-  body.day button {
-    background: rgba(255,255,255,0.35);
-    color: #000;
+    width: 80%;
+    max-width: 280px;
   }
 
   button:hover {
@@ -120,55 +94,37 @@
     margin-top: 20px;
   }
 
-  /* 🌞 ТУМБЛЕР */
-  #themeToggle {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 16px;
-  }
-
-  #themeToggle input {
-    width: 40px;
-    height: 20px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: #ccc;
-    outline: none;
+  /* 🌙 ВНУТРЕННИЙ ТУМБЛЕР */
+  .inner-toggle {
+    margin: 12px auto 0;
+    padding: 8px 16px;
+    font-size: 14px;
     border-radius: 20px;
-    position: relative;
+    border: none;
     cursor: pointer;
-    transition: background 0.3s;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
   }
 
-  #themeToggle input:checked {
-    background: #66bbff;
+  /* ДНЕВНАЯ ТЕМА */
+  body.day {
+    background: radial-gradient(circle at center, #cce0ff, #87ceeb);
+    color: #000;
   }
 
-  #themeToggle input::before {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    top: 1px;
-    left: 1px;
-    background: #fff;
-    transition: 0.3s;
+  body.day button {
+    background: rgba(255,255,255,0.45);
+    color: #000;
   }
 
-  #themeToggle input:checked::before {
-    transform: translateX(20px);
+  body.day button:hover {
+    background: rgba(255,255,255,0.8);
+    color: #000;
   }
-
 </style>
 </head>
 
-<body>
+<body class="night">
 
 <!-- ❄️ СНЕГ -->
 <script>
@@ -184,12 +140,12 @@
   }
 </script>
 
-<!-- 🌞 ТУМБЛЕР -->
-<div id="themeToggle">
-  🌞<input type="checkbox" id="toggleTheme"><span>🌙</span>
-</div>
-
 <div class="card">
+  <h1>Прогулка-сюрприз</h1>
+
+  <!-- Внутренний тумблер для Telegram -->
+  <button id="themeToggleInner" class="inner-toggle">🌙 / ☀️</button>
+
   <div id="task">
     Пора выйти на прогулку 😉 <br>
     Нажми кнопку ниже и смотри, куда она приведёт ⬇️
@@ -206,6 +162,9 @@
     <p>Спасибо за эту прогулку ❄️<br>Надеюсь, она получилась приятной и с ноткой волшебства.</p>
   </div>
 </div>
+
+<!-- Верхний тумблер для обычного браузера -->
+<button id="themeToggle" style="position:fixed;top:8px;right:8px;z-index:20;padding:6px 12px;border:none;border-radius:20px;background:rgba(255,255,255,0.25);cursor:pointer;">🌙 / ☀️</button>
 
 <script>
 /* ===== ЗАДАНИЯ (ЛЕГКО РЕДАКТИРОВАТЬ) ===== */
@@ -231,6 +190,7 @@ const tasksSource = [
 let bag = [];
 let currentTask = null;
 let started = false;
+let doneTasks = [];
 
 /* ===== ЭЛЕМЕНТЫ ===== */
 const taskEl = document.getElementById('task');
@@ -238,7 +198,6 @@ const mainBtn = document.getElementById('mainBtn');
 const skipBtn = document.getElementById('skipBtn');
 const finishBtn = document.getElementById('finishBtn');
 const finishScreen = document.getElementById('finishScreen');
-const toggleTheme = document.getElementById('toggleTheme');
 
 /* ===== МЕШОК ===== */
 function refillBag() {
@@ -259,6 +218,7 @@ mainBtn.onclick = () => {
     nextTask();
     mainBtn.textContent = '✅ Сделано';
   } else {
+    doneTasks.push(currentTask);
     nextTask();
   }
 };
@@ -274,10 +234,20 @@ finishBtn.onclick = () => {
   finishScreen.style.display = 'block';
 };
 
-/* ===== ПЕРЕКЛЮЧЕНИЕ ДЕНЬ/НОЧЬ ===== */
-toggleTheme.addEventListener('change', () => {
-  document.body.classList.toggle('day', toggleTheme.checked);
-});
+/* ===== ТУМБЛЕРЫ ===== */
+const toggle = document.getElementById('themeToggle');
+const toggleInner = document.getElementById('themeToggleInner');
+
+function toggleTheme() {
+  document.body.classList.toggle('day');
+  document.body.classList.toggle('night');
+  const isDay = document.body.classList.contains('day');
+  toggle.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+  toggleInner.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+}
+
+toggle.onclick = toggleTheme;
+toggleInner.onclick = toggleTheme;
 </script>
 
 </body>

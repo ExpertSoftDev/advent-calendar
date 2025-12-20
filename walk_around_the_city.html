@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Зимняя прогулка</title>
+<title>Прогулка-сюрприз</title>
 
 <style>
   body {
@@ -16,7 +16,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background .5s, color .5s;
+    transition: background 0.5s, color 0.5s;
   }
 
   /* ❄️ СНЕЖИНКИ */
@@ -33,12 +33,6 @@
     to { transform: translateY(110vh); }
   }
 
-  /* ✨ блеск снега для дневной темы */
-  .day .snowflake {
-    text-shadow: 0 0 6px #fff, 0 0 12px #fffa;
-    color: #1a237e;
-  }
-
   .card {
     position: relative;
     background: rgba(255,255,255,0.08);
@@ -47,27 +41,37 @@
     padding: 32px 30px 36px;
     width: 90%;
     max-width: 520px;
-    box-shadow: 0 0 30px rgba(180,120,255,.35), inset 0 0 25px rgba(255,255,255,.08);
+    box-shadow:
+      0 0 30px rgba(180,120,255,.35),
+      inset 0 0 25px rgba(255,255,255,.08);
     text-align: center;
     z-index: 10;
-    transition: background .5s, box-shadow .5s;
   }
 
-  body.day .card {
-    background: rgba(255,255,255,0.2);
-    box-shadow: 0 0 40px rgba(255,255,255,.3), inset 0 0 25px rgba(255,255,255,.12);
+  h1 {
+    margin-top: 0;
+    font-size: 28px;
   }
 
-  h1 { margin-top: 0; font-size: 28px; }
+  #task {
+    margin: 30px 0;
+    font-size: 21px;
+    line-height: 1.4;
+    min-height: 90px;
+  }
 
-  #task { margin: 30px 0; font-size: 21px; line-height: 1.4; min-height: 90px; }
-
-  #buttons { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  #buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    box-shadow: inset 0 12px 18px rgba(255,255,255,.08);
+  }
 
   button {
-    width: 220px;
-    margin: 4px 0;
-    padding: 12px 0;
+    margin: 8px 0;
+    padding: 12px 18px;
     font-size: 16px;
     border-radius: 10px;
     border: none;
@@ -75,59 +79,76 @@
     background: rgba(255,255,255,0.22);
     color: #fff;
     transition: .2s;
+    width: 80%;
+    max-width: 280px;
   }
 
-  body.day button { background: rgba(255,255,255,0.35); color: #000; }
+  button:hover {
+    background: rgba(200,170,255,.85);
+    color: #000;
+  }
 
-  button:hover { background: rgba(200,170,255,.85); color: #000; }
+  #finishScreen {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+  }
 
-  #finishScreen { display: none; text-align: center; margin-top: 20px; }
-
-  /* ===== ТУМБЛЕР ===== */
-  #themeToggle {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-    z-index: 100;
+  /* 🌙 ВНУТРЕННИЙ ТУМБЛЕР */
+  .inner-toggle {
+    margin: 12px auto 0;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    border: none;
     cursor: pointer;
-    font-size: 22px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    user-select: none;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
   }
 
-  body.day #themeToggle { background: rgba(255,255,255,0.35); color: #000; }
+  /* ДНЕВНАЯ ТЕМА */
+  body.day {
+    background: radial-gradient(circle at center, #cce0ff, #87ceeb);
+    color: #000;
+  }
 
+  body.day button {
+    background: rgba(255,255,255,0.45);
+    color: #000;
+  }
+
+  body.day button:hover {
+    background: rgba(255,255,255,0.8);
+    color: #000;
+  }
 </style>
 </head>
 
-<body>
+<body class="night">
 
 <!-- ❄️ СНЕГ -->
 <script>
-for (let i = 0; i < 40; i++) {
-  const s = document.createElement('div');
-  s.className = 'snowflake';
-  s.textContent = '❄️';
-  s.style.left = Math.random() * 100 + 'vw';
-  s.style.fontSize = 12 + Math.random() * 18 + 'px';
-  s.style.animationDuration = 8 + Math.random() * 12 + 's';
-  s.style.opacity = Math.random();
-  document.body.appendChild(s);
-}
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'snowflake';
+    s.textContent = '❄️';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.fontSize = 12 + Math.random() * 18 + 'px';
+    s.style.animationDuration = 8 + Math.random() * 12 + 's';
+    s.style.opacity = Math.random();
+    document.body.appendChild(s);
+  }
 </script>
 
-<!-- Тумблер темы -->
-<div id="themeToggle">🌙</div>
-
 <div class="card">
-  <h1>✨ Зимняя прогулка</h1>
+  <h1>Прогулка-сюрприз</h1>
+
+  <!-- Внутренний тумблер для Telegram -->
+  <button id="themeToggleInner" class="inner-toggle">🌙 / ☀️</button>
 
   <div id="task">
-    Пора выйти на прогулку!<br>
-    Нажми кнопку ниже и следуй подсказкам.
+    Пора выйти на прогулку 😉 <br>
+    Нажми кнопку ниже и смотри, куда она приведёт ⬇️
   </div>
 
   <div id="buttons">
@@ -142,8 +163,11 @@ for (let i = 0; i < 40; i++) {
   </div>
 </div>
 
+<!-- Верхний тумблер для обычного браузера -->
+<button id="themeToggle" style="position:fixed;top:8px;right:8px;z-index:20;padding:6px 12px;border:none;border-radius:20px;background:rgba(255,255,255,0.25);cursor:pointer;">🌙 / ☀️</button>
+
 <script>
-/* ===== ЗАДАНИЯ ===== */
+/* ===== ЗАДАНИЯ (ЛЕГКО РЕДАКТИРОВАТЬ) ===== */
 const tasksSource = [
   'Иди до ближайшего перекрёстка',
   'Поверни налево и иди до остановки',
@@ -210,16 +234,20 @@ finishBtn.onclick = () => {
   finishScreen.style.display = 'block';
 };
 
-/* ===== ТУМБЛЕР ===== */
-const themeToggle = document.getElementById('themeToggle');
-themeToggle.onclick = () => {
+/* ===== ТУМБЛЕРЫ ===== */
+const toggle = document.getElementById('themeToggle');
+const toggleInner = document.getElementById('themeToggleInner');
+
+function toggleTheme() {
   document.body.classList.toggle('day');
-  if (document.body.classList.contains('day')) {
-    themeToggle.textContent = '🌙';
-  } else {
-    themeToggle.textContent = '☀️';
-  }
-};
+  document.body.classList.toggle('night');
+  const isDay = document.body.classList.contains('day');
+  toggle.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+  toggleInner.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+}
+
+toggle.onclick = toggleTheme;
+toggleInner.onclick = toggleTheme;
 </script>
 
 </body>

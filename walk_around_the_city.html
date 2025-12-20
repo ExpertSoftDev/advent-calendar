@@ -61,7 +61,6 @@
     min-height: 90px;
   }
 
-  /* 🧊 НАЛЕДЬ НА КНОПКАХ */
   #buttons {
     padding-top: 20px;
     border-top: 1px solid rgba(255,255,255,.15);
@@ -119,7 +118,7 @@
 </script>
 
 <div class="card">
-  <h1>Прогулка-сюрприз</h1>
+  <h1 id="title">Прогулка-сюрприз</h1>
 
   <div id="task">
     Пора выйти на прогулку 😉 <br>
@@ -142,7 +141,7 @@
 </div>
 
 <script>
-/* ===== ЗАДАНИЯ (ЛЕГКО РЕДАКТИРОВАТЬ) ===== */
+/* ===== ЗАДАНИЯ ===== */
 const tasksSource = [
   'Иди до ближайшего перекрёстка',
   'Поверни налево и иди до остановки',
@@ -172,6 +171,7 @@ const mainBtn = document.getElementById('mainBtn');
 const skipBtn = document.getElementById('skipBtn');
 const finishBtn = document.getElementById('finishBtn');
 const finishScreen = document.getElementById('finishScreen');
+const titleEl = document.getElementById('title');
 
 /* ===== МЕШОК ===== */
 function refillBag() {
@@ -202,6 +202,7 @@ skipBtn.onclick = () => {
 };
 
 finishBtn.onclick = () => {
+  titleEl.style.display = 'none';
   taskEl.style.display = 'none';
   document.getElementById('buttons').style.display = 'none';
   finishScreen.style.display = 'block';

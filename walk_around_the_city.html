@@ -6,144 +6,129 @@
 <title>Прогулка-сюрприз</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: radial-gradient(circle at center, #1a0933, #000);
-    color: #fff;
-    min-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background 0.5s, color 0.5s;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at center, #1a0933, #000);
+  color: #fff;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.5s, color 0.5s;
+}
 
-  body.day {
-    background: radial-gradient(circle at center, #cce0ff, #87ceeb);
-    color: #000;
-  }
+body.day {
+  background: radial-gradient(circle at center, #cce0ff, #87ceeb);
+  color: #000;
+}
 
-  body.day button {
-    background: rgba(255,255,255,0.45);
-    color: #000;
-  }
+body.day button {
+  background: rgba(255,255,255,0.45);
+  color: #000;
+}
 
-  body.day button:hover {
-    background: rgba(255,255,255,0.8);
-    color: #000;
-  }
+body.day button:hover {
+  background: rgba(255,255,255,0.8);
+  color: #000;
+}
 
-  /* ❄️ СНЕЖИНКИ с мерцанием */
-  .snowflake {
-    position: fixed;
-    top: -20px;
-    pointer-events: none;
-    color: #fff;
-    opacity: .8;
-    animation: fall linear infinite, sparkle ease-in-out infinite;
-  }
+/* ❄️ СНЕЖИНКИ только для ночи с мерцанием */
+.snowflake {
+  position: fixed;
+  top: -20px;
+  pointer-events: none;
+  color: #fff;
+  opacity: .8;
+  animation: fall linear infinite, sparkle ease-in-out infinite;
+}
 
-  @keyframes fall {
-    to { transform: translateY(110vh); }
-  }
+@keyframes fall {
+  to { transform: translateY(110vh); }
+}
 
-  @keyframes sparkle {
-    0%, 100% { opacity: 0.2; }
-    50% { opacity: 0.8; }
-  }
+@keyframes sparkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
 
-  .card {
-    position: relative;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(8px);
-    border-radius: 22px;
-    padding: 32px 30px 36px;
-    width: 90%;
-    max-width: 520px;
-    box-shadow:
-      0 0 30px rgba(180,120,255,.35),
-      inset 0 0 25px rgba(255,255,255,.08);
-    text-align: center;
-    z-index: 10;
-  }
+.card {
+  position: relative;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 22px;
+  padding: 32px 30px 36px;
+  width: 90%;
+  max-width: 520px;
+  box-shadow:
+    0 0 30px rgba(180,120,255,.35),
+    inset 0 0 25px rgba(255,255,255,.08);
+  text-align: center;
+  z-index: 10;
+}
 
-  h1 {
-    margin-top: 0;
-    font-size: 28px;
-  }
+h1 {
+  margin-top: 0;
+  font-size: 28px;
+}
 
-  #task {
-    margin: 30px 0;
-    font-size: 21px;
-    line-height: 1.4;
-    min-height: 90px;
-  }
+#task {
+  margin: 30px 0;
+  font-size: 21px;
+  line-height: 1.4;
+  min-height: 90px;
+}
 
-  #buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255,255,255,.15);
-    box-shadow: inset 0 12px 18px rgba(255,255,255,.08);
-  }
+#buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.15);
+  box-shadow: inset 0 12px 18px rgba(255,255,255,.08);
+}
 
-  button {
-    margin: 8px 0;
-    padding: 12px 18px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    background: rgba(255,255,255,0.22);
-    color: #fff;
-    transition: .2s;
-    width: 80%;
-    max-width: 280px;
-  }
+button {
+  margin: 8px 0;
+  padding: 12px 18px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  transition: .2s;
+  width: 80%;
+  max-width: 280px;
+}
 
-  button:hover {
-    background: rgba(200,170,255,.85);
-    color: #000;
-  }
+button:hover {
+  background: rgba(200,170,255,.85);
+  color: #000;
+}
 
-  #finishScreen {
-    display: none;
-    text-align: center;
-    margin-top: 20px;
-  }
+#finishScreen {
+  display: none;
+  text-align: center;
+  margin-top: 20px;
+}
 
-  /* Верхний тумблер */
-  #themeToggle {
-    position: fixed;
-    top: 8px;
-    right: 8px;
-    z-index: 20;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.25);
-    cursor: pointer;
-  }
+#themeToggle {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  z-index: 20;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+}
 </style>
 </head>
 
 <body class="night">
-
-<!-- ❄️ СНЕГ -->
-<script>
-for (let i = 0; i < 40; i++) {
-  const s = document.createElement('div');
-  s.className = 'snowflake';
-  s.textContent = '❄️';
-  s.style.left = Math.random() * 100 + 'vw';
-  s.style.fontSize = 12 + Math.random() * 18 + 'px';
-  s.style.animationDuration = 8 + Math.random() * 12 + 's';
-  s.style.opacity = Math.random();
-  document.body.appendChild(s);
-}
-</script>
 
 <div class="card">
   <h1>Прогулка-сюрприз</h1>
@@ -165,7 +150,6 @@ for (let i = 0; i < 40; i++) {
   </div>
 </div>
 
-<!-- Тумблер день/ночь -->
 <button id="themeToggle">🌙 / ☀️</button>
 
 <script>
@@ -203,22 +187,16 @@ function nextTask() { if(bag.length===0) refillBag(); currentTask=bag.pop(); tas
 
 /* ===== КНОПКИ ===== */
 mainBtn.onclick = () => {
-  if (!started) {
-    started = true;
-    refillBag();
-    nextTask();
-    mainBtn.textContent = '✅ Сделано';
-  } else {
-    nextTask();
-  }
+  if (!started) { started = true; refillBag(); nextTask(); mainBtn.textContent='✅ Сделано'; } 
+  else { nextTask(); }
 };
 
-skipBtn.onclick = () => { if (!started) return; nextTask(); };
+skipBtn.onclick = () => { if(!started) return; nextTask(); };
 
 finishBtn.onclick = () => {
-  taskEl.style.display = 'none';
-  document.getElementById('buttons').style.display = 'none';
-  finishScreen.style.display = 'block';
+  taskEl.style.display='none';
+  document.getElementById('buttons').style.display='none';
+  finishScreen.style.display='block';
 };
 
 /* ===== ТУМБЛЕР ===== */
@@ -228,8 +206,29 @@ toggle.onclick = () => {
   document.body.classList.toggle('night');
   const isDay = document.body.classList.contains('day');
   toggle.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+
+  // Если дневная тема, удаляем снежинки
+  document.querySelectorAll('.snowflake').forEach(s => s.style.display = isDay ? 'none' : 'block');
 };
+
+// Создание снежинок только для ночной темы
+function createSnowflakes() {
+  if(document.body.classList.contains('night')) {
+    for (let i=0;i<40;i++) {
+      const s=document.createElement('div');
+      s.className='snowflake';
+      s.textContent='❄️';
+      s.style.left=Math.random()*100+'vw';
+      s.style.fontSize=12+Math.random()*18+'px';
+      s.style.animationDuration=8+Math.random()*12+'s';
+      s.style.opacity=Math.random();
+      document.body.appendChild(s);
+    }
+  }
+}
+createSnowflakes();
 </script>
 
 </body>
 </html>
+

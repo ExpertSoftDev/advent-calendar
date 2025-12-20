@@ -34,14 +34,14 @@
     color: #000;
   }
 
-  /* ❄️ СНЕЖИНКИ */
+  /* ❄️ СНЕЖИНКИ с мерцанием */
   .snowflake {
     position: fixed;
     top: -20px;
     pointer-events: none;
     color: #fff;
     opacity: .8;
-    animation: fall linear infinite;
+    animation: fall linear infinite, sparkle ease-in-out infinite;
   }
 
   @keyframes fall {
@@ -51,10 +51,6 @@
   @keyframes sparkle {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 0.8; }
-  }
-
-  body.day .snowflake {
-    animation: fall linear infinite, sparkle ease-in-out infinite;
   }
 
   .card {
@@ -150,6 +146,8 @@ for (let i = 0; i < 40; i++) {
 </script>
 
 <div class="card">
+  <h1>Прогулка-сюрприз</h1>
+
   <div id="task">
     Пора выйти на прогулку 😉 <br>
     Нажми кнопку ниже и смотри, куда она приведёт ⬇️

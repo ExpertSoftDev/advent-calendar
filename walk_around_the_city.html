@@ -9,27 +9,17 @@
   body {
     margin: 0;
     font-family: Arial, sans-serif;
+    background: radial-gradient(circle at center, #1a0933, #000);
+    color: #fff;
     min-height: 100vh;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background 0.6s, color 0.6s;
+    transition: background 0.5s, color 0.5s;
   }
 
-  /* 🌙 НОЧЬ */
-  body.night {
-    background: radial-gradient(circle at center, #1a0933, #000);
-    color: #fff;
-  }
-
-  /* ☀️ ДЕНЬ */
-  body.day {
-    background: radial-gradient(circle at center, #f4f8ff, #dbe6ff);
-    color: #1a1a1a;
-  }
-
-  /* ❄️ СНЕЖИНКИ (ночь) */
+  /* ❄️ СНЕЖИНКИ */
   .snowflake {
     position: fixed;
     top: -20px;
@@ -39,56 +29,23 @@
     animation: fall linear infinite;
   }
 
-  body.day .snowflake {
-    display: none;
-  }
-
   @keyframes fall {
     to { transform: translateY(110vh); }
   }
 
-  /* ✨ БЛЕСК СНЕГА (день) */
-  .sparkle {
-    position: fixed;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 70%);
-    opacity: 0;
-    pointer-events: none;
-    animation: shimmer 4s infinite ease-in-out;
-  }
-
-  body.night .sparkle {
-    display: none;
-  }
-
-  @keyframes shimmer {
-    0%   { opacity: 0; transform: scale(0.6); }
-    50%  { opacity: 0.9; transform: scale(1.2); }
-    100% { opacity: 0; transform: scale(0.6); }
-  }
-
   .card {
     position: relative;
-    background: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.08);
     backdrop-filter: blur(8px);
     border-radius: 22px;
-    padding: 34px 30px 36px;
+    padding: 32px 30px 36px;
     width: 90%;
     max-width: 520px;
     box-shadow:
-      0 0 30px rgba(180,120,255,.25),
+      0 0 30px rgba(180,120,255,.35),
       inset 0 0 25px rgba(255,255,255,.08);
     text-align: center;
     z-index: 10;
-  }
-
-  body.day .card {
-    background: rgba(255,255,255,0.75);
-    box-shadow:
-      0 12px 30px rgba(120,160,255,.35),
-      inset 0 0 25px rgba(255,255,255,.9);
   }
 
   h1 {
@@ -103,76 +60,74 @@
     min-height: 90px;
   }
 
-  /* 🧊 КНОПКИ */
   #buttons {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: center;
     padding-top: 20px;
     border-top: 1px solid rgba(255,255,255,.15);
+    box-shadow: inset 0 12px 18px rgba(255,255,255,.08);
   }
 
   button {
-    padding: 14px 18px;
+    margin: 8px 0;
+    padding: 12px 18px;
     font-size: 16px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    transition: .25s;
-  }
-
-  /* 🌙 ночь */
-  body.night button {
     background: rgba(255,255,255,0.22);
     color: #fff;
-    box-shadow: inset 0 0 10px rgba(255,255,255,.12);
-  }
-
-  /* ☀️ день */
-  body.day button {
-    background: linear-gradient(
-      180deg,
-      #ffffff,
-      #e9f1ff
-    );
-    color: #1a1a1a;
-    box-shadow:
-      0 4px 14px rgba(120,160,255,.45),
-      inset 0 0 12px rgba(255,255,255,.9);
+    transition: .2s;
+    width: 80%;
+    max-width: 280px;
   }
 
   button:hover {
-    transform: translateY(-1px);
-  }
-
-  /* 🌗 ТУМБЛЕР */
-  #themeToggle {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-    font-size: 14px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    z-index: 50;
+    background: rgba(200,170,255,.85);
+    color: #000;
   }
 
   #finishScreen {
     display: none;
-    margin-top: 10px;
+    text-align: center;
+    margin-top: 20px;
   }
 
-  #finishScreen h2 {
-    margin-top: 0;
+  /* 🌙 ВНУТРЕННИЙ ТУМБЛЕР */
+  .inner-toggle {
+    margin: 12px auto 0;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
+  }
+
+  /* ДНЕВНАЯ ТЕМА */
+  body.day {
+    background: radial-gradient(circle at center, #cce0ff, #87ceeb);
+    color: #000;
+  }
+
+  body.day button {
+    background: rgba(255,255,255,0.45);
+    color: #000;
+  }
+
+  body.day button:hover {
+    background: rgba(255,255,255,0.8);
+    color: #000;
   }
 </style>
 </head>
 
 <body class="night">
 
-<button id="themeToggle">☀️ День</button>
-
+<!-- ❄️ СНЕГ -->
 <script>
-  /* ❄️ СНЕГ */
   for (let i = 0; i < 40; i++) {
     const s = document.createElement('div');
     s.className = 'snowflake';
@@ -180,25 +135,19 @@
     s.style.left = Math.random() * 100 + 'vw';
     s.style.fontSize = 12 + Math.random() * 18 + 'px';
     s.style.animationDuration = 8 + Math.random() * 12 + 's';
+    s.style.opacity = Math.random();
     document.body.appendChild(s);
-  }
-
-  /* ✨ БЛЕСК */
-  for (let i = 0; i < 60; i++) {
-    const sp = document.createElement('div');
-    sp.className = 'sparkle';
-    sp.style.left = Math.random() * 100 + 'vw';
-    sp.style.top = Math.random() * 100 + 'vh';
-    sp.style.animationDelay = Math.random() * 4 + 's';
-    document.body.appendChild(sp);
   }
 </script>
 
-<div class="card" id="card">
-  <h1 id="title">Прогулка-сюрприз</h1>
+<div class="card">
+  <h1>Прогулка-сюрприз</h1>
+
+  <!-- Внутренний тумблер для Telegram -->
+  <button id="themeToggleInner" class="inner-toggle">🌙 / ☀️</button>
 
   <div id="task">
-    Пора выйти на прогулку 😉<br>
+    Пора выйти на прогулку 😉 <br>
     Нажми кнопку ниже и смотри, куда она приведёт ⬇️
   </div>
 
@@ -210,15 +159,15 @@
 
   <div id="finishScreen">
     <h2>✨ Прогулка завершена</h2>
-    <p>
-      Спасибо за эту прогулку ❄️<br>
-      Надеюсь, она получилась приятной и с ноткой волшебства.
-    </p>
+    <p>Спасибо за эту прогулку ❄️<br>Надеюсь, она получилась приятной и с ноткой волшебства.</p>
   </div>
 </div>
 
+<!-- Верхний тумблер для обычного браузера -->
+<button id="themeToggle" style="position:fixed;top:8px;right:8px;z-index:20;padding:6px 12px;border:none;border-radius:20px;background:rgba(255,255,255,0.25);cursor:pointer;">🌙 / ☀️</button>
+
 <script>
-/* ===== ЗАДАНИЯ ===== */
+/* ===== ЗАДАНИЯ (ЛЕГКО РЕДАКТИРОВАТЬ) ===== */
 const tasksSource = [
   'Иди до ближайшего перекрёстка',
   'Поверни налево и иди до остановки',
@@ -232,22 +181,25 @@ const tasksSource = [
   'Сделай фото отражений в витрине',
   'Пройди 5 минут без телефона',
   'Зайди в любой магазин и просто осмотрись',
-  'Найди дом, в котором раньше не бывал',
+  'Найди дом, в котором никогда не был(а)',
   'Посмотри на небо и сделай фото',
   'Улыбнись кому-нибудь по дороге'
 ];
 
+/* ===== СОСТОЯНИЕ ===== */
 let bag = [];
 let currentTask = null;
 let started = false;
+let doneTasks = [];
 
+/* ===== ЭЛЕМЕНТЫ ===== */
 const taskEl = document.getElementById('task');
 const mainBtn = document.getElementById('mainBtn');
 const skipBtn = document.getElementById('skipBtn');
 const finishBtn = document.getElementById('finishBtn');
 const finishScreen = document.getElementById('finishScreen');
-const titleEl = document.getElementById('title');
 
+/* ===== МЕШОК ===== */
 function refillBag() {
   bag = [...tasksSource].sort(() => Math.random() - 0.5);
 }
@@ -258,6 +210,7 @@ function nextTask() {
   taskEl.textContent = currentTask;
 }
 
+/* ===== КНОПКИ ===== */
 mainBtn.onclick = () => {
   if (!started) {
     started = true;
@@ -265,6 +218,7 @@ mainBtn.onclick = () => {
     nextTask();
     mainBtn.textContent = '✅ Сделано';
   } else {
+    doneTasks.push(currentTask);
     nextTask();
   }
 };
@@ -277,19 +231,23 @@ skipBtn.onclick = () => {
 finishBtn.onclick = () => {
   taskEl.style.display = 'none';
   document.getElementById('buttons').style.display = 'none';
-  titleEl.style.display = 'none';
   finishScreen.style.display = 'block';
 };
 
-/* 🌗 ТУМБЛЕР */
+/* ===== ТУМБЛЕРЫ ===== */
 const toggle = document.getElementById('themeToggle');
-toggle.onclick = () => {
+const toggleInner = document.getElementById('themeToggleInner');
+
+function toggleTheme() {
   document.body.classList.toggle('day');
   document.body.classList.toggle('night');
-  toggle.textContent = document.body.classList.contains('day')
-    ? '🌙 Ночь'
-    : '☀️ День';
-};
+  const isDay = document.body.classList.contains('day');
+  toggle.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+  toggleInner.textContent = isDay ? '🌙 Ночь' : '☀️ День';
+}
+
+toggle.onclick = toggleTheme;
+toggleInner.onclick = toggleTheme;
 </script>
 
 </body>
